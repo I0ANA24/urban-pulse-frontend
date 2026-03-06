@@ -1,11 +1,8 @@
-"use client";
-
 import { Pencil, Star } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Profile() {
-  const router = useRouter();
 
   return (
     <>
@@ -25,10 +22,12 @@ export default function Profile() {
           Bennett
         </h1>
 
+        <Link href="/profile/settings">
         <button className="flex items-center justify-center gap-2 bg-green-light text-black px-5 py-2 rounded-full text-[14px] font-semibold hover:bg-[#d4d4d4] transition-colors mb-6">
           <Pencil className="w-[15px] h-[15px]" strokeWidth={2.5} />
           Edit profile
         </button>
+        </Link>
 
         <div className="text-[13px] text-foreground/80 leading-[1.6] flex gap-2 w-full">
           <span className="text-foreground whitespace-nowrap">Bio:</span>

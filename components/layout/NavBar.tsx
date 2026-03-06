@@ -26,7 +26,7 @@ export default function NavBar() {
             className="text-white cursor-pointer hover:scale-105 hover:text-green-light focus:text-green-light transition-all duration-200"
           />
         </Link>
-        <Link href="chat">
+        <Link href="/chat">
           <MessageCircle
             size={28}
             className="text-white cursor-pointer hover:scale-105 hover:text-green-light focus:text-green-light transition-all duration-200"
