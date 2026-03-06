@@ -1,7 +1,7 @@
 import Container from "@/components/layout/Container";
 import TopBar from "@/components/layout/TopBar";
 
-export default function DashboardLayout({
+export default function ChatLayout({
   children,
 }: {
   children: React.ReactNode;

@@ -1,9 +1,9 @@
-import NavBar from "@/components/NavBar";
+import NavBar from "@/components/layout/NavBar";
 
 export default function DashboardPage() {
   return (
-    <div>
-      <p className="">bibif</p>
+    <div className="w-screen h-screen bg-background">
+      <p className="">Main Page</p>
     </div>
   );
 }
