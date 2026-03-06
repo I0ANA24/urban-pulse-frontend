@@ -41,8 +41,8 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-background font-sans">
-      <div className="w-full max-w-100 px-9 pb-8 animate-fade-up">
+    <div className="min-h-screen w-full flex justify-center items-center bg-background text-foreground font-sans">
+      <div className="w-100 max-w-full px-5 py-6 pb-8 animate-fade-up">
         
         <div className="text-center mb-6">
           <span className="font-serif text-[32px] font-medium text-foreground tracking-[-0.5px]">

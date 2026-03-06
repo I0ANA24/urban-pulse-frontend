@@ -20,19 +20,19 @@ export default function NavBar() {
             className="text-white cursor-pointer hover:scale-105 hover:text-green-light focus:text-green-light transition-all duration-200"
           />
         </Link>
-        <Link href="/dashboard/map">
+        <Link href="/map">
           <Map
             size={28}
             className="text-white cursor-pointer hover:scale-105 hover:text-green-light focus:text-green-light transition-all duration-200"
           />
         </Link>
-        <Link href="/dashboard/chat">
+        <Link href="chat">
           <MessageCircle
             size={28}
             className="text-white cursor-pointer hover:scale-105 hover:text-green-light focus:text-green-light transition-all duration-200"
           />
         </Link>
-        <Link href="/dashboard/profile">
+        <Link href="/profile">
           <User
             size={28}
             className="text-white cursor-pointer hover:scale-105 hover:text-green-light focus:text-green-light transition-all duration-200"
