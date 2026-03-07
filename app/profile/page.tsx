@@ -6,17 +6,17 @@ export default function Profile() {
 
   return (
     <>
-      <div className="flex flex-col items-center mb-7">
-        <div className="w-46 h-46 rounded-full mb-4">
+      <div className="flex flex-col items-center justify-center gap-4 mb-7">
+        <div className="w-46 h-46 rounded-full">
           <Image
             src="/profile.png"
-            width={184}
-            height={184}
+            width={186}
+            height={175}
             alt="profile_picture"
           />
         </div>
 
-        <h1 className="text-2xl font-extrabold text-center leading-[1.15] mb-4">
+        <h1 className="text-2xl font-montagu font-bold text-center leading-[1.15]">
           Greta
           <br />
           Bennett

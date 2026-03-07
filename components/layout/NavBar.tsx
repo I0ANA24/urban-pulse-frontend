@@ -7,7 +7,7 @@ import { Home, Map, MessageCircle, User } from "lucide-react";
 export default function NavBar() {
   const pathname = usePathname();
 
-  if (pathname.startsWith("/dashboard/profile")) {
+  if (pathname.startsWith("/profile")) {
     return null;
   }
 

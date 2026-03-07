@@ -14,7 +14,7 @@ export default function ProfileLayout({
   return (
     <Container>
       <TopBar
-        back={pathname === "/profile/settings"}
+        back={pathname.startsWith("/profile")}
         notifications={true}
         settings={pathname === "/profile"}
       />
