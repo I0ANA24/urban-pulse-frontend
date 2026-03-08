@@ -20,7 +20,7 @@ export default function EditProfile() {
           Edit profile
         </h1>
 
-        <HorizontalCard title="Name" placeholder="Enter your name..." />
+        <HorizontalCard title="Name" type="text" placeholder="Enter your name..." />
         <BSTCard title="Bio">
           <textarea
             placeholder="Tell us something about you..."
