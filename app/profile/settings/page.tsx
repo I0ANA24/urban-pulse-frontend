@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function Settings() {
   return (
     <>
-      <div className="w-full h-full flex flex-col items-center gap-6">
+      <div className="w-full h-full flex flex-col items-center gap-6 animate-fade-up">
         <div className="flex flex-col justify-center items-center gap-3">
           <div className="w-full flex justify-center items-center">
             <Image

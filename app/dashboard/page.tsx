@@ -2,7 +2,7 @@ import NavBar from "@/components/layout/NavBar";
 
 export default function DashboardPage() {
   return (
-    <div className="w-screen h-screen bg-background">
+    <div className="w-screen bg-background">
       <p className="">Main Page</p>
     </div>
   );

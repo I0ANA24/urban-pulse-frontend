@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function EditProfile() {
   return (
     <>
-      <div className="w-full h-full flex flex-col items-center gap-5">
+      <div className="w-full h-full flex flex-col items-center gap-5 animate-fade-up">
         <div className="w-full flex justify-center items-center">
           <Image
             src="/profile.png"
