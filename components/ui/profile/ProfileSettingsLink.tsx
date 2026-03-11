@@ -2,14 +2,16 @@ import {
   BarChart2,
   Bookmark,
   ChevronRight,
+  Clock,
   Paintbrush,
   Pencil,
+  Radar,
   Shield,
 } from "lucide-react";
 import Link from "next/link";
 
 interface ProfileSettingsLinkProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  text: "edit" | "personal" | "security" | "saved" | "preferences";
+  text: "edit" | "personal" | "security" | "saved" | "preferences" | "quiet" | "distance";
 }
 
 export default function ProfileSettingsLink({
@@ -42,6 +44,16 @@ export default function ProfileSettingsLink({
       icon: Paintbrush,
       pageName: "Preferences",
     },
+    quiet: {
+      route: "./preferences/quiet",
+      icon: Clock,
+      pageName: "Quiet Hours",
+    },
+    distance: {
+      route: "./preferences/distance",
+      icon: Radar,
+      pageName: "Distance Limit",
+    }
   };
 
   const IconComponent = content[text].icon;

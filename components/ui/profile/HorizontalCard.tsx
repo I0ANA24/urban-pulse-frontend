@@ -17,33 +17,35 @@ export default function HorizontalCard({
 }: HorizontalCardProps & React.InputHTMLAttributes<HTMLInputElement>) {
   const [showPassword, setShowPassword] = useState(false);
   const inputType = type === "password" && showPassword ? "text" : type;
-  const isDisabled = title === "Email" || title === "Phone Number" || title === "Password";
+  const isDisabled =
+    title === "Email" || title === "Phone Number" || title === "Password";
 
   return (
     <div className="w-full px-5 py-4 bg-secondary rounded-2xl flex items-center justify-between">
-      <div className="flex items-center flex-1">
+      <div className="w-full flex items-center flex-1 relative">
         <h5 className="font-bold text-sm min-w-17.5">{title}</h5>
 
         <div className="w-px h-5 bg-white/90 mx-3"></div>
 
-        <input
-          type={inputType}
-          placeholder={placeholder}
-          disabled={isDisabled}
-          className="text-sm outline-none bg-transparent flex-1"
-          {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
-        />
+        <div className="w-full">
+          <input
+            type={inputType}
+            placeholder={placeholder}
+            disabled={isDisabled}
+            className="text-sm outline-none bg-transparent flex-1"
+            {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
+          />
+        </div>
+        {type === "password" && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-0 text-xs text-white/70 hover:text-white ml-2 cursor-pointer"
+          >
+            {showPassword ? <EyeIcon /> : <EyeClosedIcon />}
+          </button>
+        )}
       </div>
-
-      {type === "password" && (
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="text-xs text-white/70 hover:text-white ml-2 cursor-pointer"
-        >
-          {showPassword ?  <EyeIcon /> : <EyeClosedIcon />}
-        </button>
-      )}
     </div>
   );
 }
