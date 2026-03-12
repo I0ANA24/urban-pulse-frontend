@@ -8,8 +8,12 @@ export default function DashboardLayout({
 }) {
   return (
     <Container>
-      <TopBar back={false} notifications={true} settings={false} />
-      {children}
+      <div className="relative">
+        <div className="absolute top-0 left-0 right-0 z-10 px-4 pt-4">
+          <TopBar back={false} notifications={true} settings={false} />
+        </div>
+        {children}
+      </div>
     </Container>
   );
 }
