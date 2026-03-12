@@ -44,15 +44,6 @@ export default function DistanceLimitPage() {
           </div>
         </section>
       </div>
-
-      {/* Stiluri globale pentru a ascunde complet săgețile de la inputul de tip number (opțional, dar recomandat) */}
-      <style jsx global>{`
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-        }
-      `}</style>
     </ProfilePageTemplate>
   );
 }
