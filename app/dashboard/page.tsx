@@ -53,7 +53,7 @@ export default function DashboardPage() {
     <div className="w-full min-h-screen pb-[8vh]">
 
       {/* Header */}
-      <div className="relative w-full h-[140px] overflow-hidden">
+      <div className="relative w-full h-35 overflow-hidden">
         <Image
           src="/header.jpg"
           alt="header"
@@ -61,7 +61,7 @@ export default function DashboardPage() {
           className="object-cover object-top"
           loading="eager"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
       </div>
 
       {/* Widget */}
@@ -103,7 +103,7 @@ export default function DashboardPage() {
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter === activeFilter ? "ALL" : filter)}
-                className="flex-shrink-0 py-3 rounded-2xl text-xs font-bold bg-[#facc15] text-black snap-start"
+                className="shrink-0 py-3 rounded-2xl text-xs font-bold bg-[#facc15] text-black snap-start"
                 style={{ width: "calc(33.333% - 6px)" }}
               >
                 {filter}
@@ -112,7 +112,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Fade dreapta */}
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-background to-transparent pointer-events-none" />
         </div>
 
         {/* Dots indicator */}
