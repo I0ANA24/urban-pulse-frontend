@@ -135,7 +135,7 @@ export default function DashboardPage() {
               <button
                 key={filter.title}
                 onClick={() => setActiveFilter(filter.title)}
-                className="shrink-0 w-25 h-11 rounded-[10px] text-xs font-bold bg-yellow-primary text-black snap-start"
+                className="shrink-0 w-25 h-11 rounded-[10px] text-xs font-bold snap-start cursor pointer"
                 style={{
                   backgroundColor: filter.bgColor,
                   color: filter.textColor,
