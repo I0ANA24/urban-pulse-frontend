@@ -3,18 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Heart, MessageCircle, Bookmark } from "lucide-react";
-import { Event } from "@/types/Event";
-
-const typeConfig: Record<string, { label: string; color: string }> = {
-  General:   { label: "GENERAL",   color: "#4ade80" },
-  Emergency: { label: "EMERGENCY", color: "#f87171" },
-  Skill:     { label: "SKILL",     color: "#facc15" },
-  Lend:      { label: "LEND",      color: "#60a5fa" },
-  0:         { label: "GENERAL",   color: "#4ade80" },
-  1:         { label: "EMERGENCY", color: "#f87171" },
-  2:         { label: "SKILL",     color: "#facc15" },
-  3:         { label: "LEND",      color: "#60a5fa" },
-};
+import { Event, EventType } from "@/types/Event";
+import EventTag from "./ui/EventTag";
 
 function getInitials(email: string) {
   return email?.split("@")[0]?.slice(0, 2).toUpperCase() ?? "UP";
@@ -37,12 +27,18 @@ export default function EventCard({ event }: { event: Event }) {
   const [saved, setSaved] = useState(false);
   const [likes, setLikes] = useState(0);
 
-  const type = typeConfig[event.type] ?? typeConfig[0];
-
   const handleLike = () => {
     setLiked(!liked);
     setLikes(liked ? likes - 1 : likes + 1);
   };
+
+  const typeMap: Record<number, EventType> = {
+    0: "General",
+    1: "Emergency",
+    2: "Skill",
+    3: "Lend",
+  };
+  const mappedType = typeof event.type === "number" ? typeMap[event.type] : event.type;
 
   return (
     <div className="w-full bg-[#111111] border border-white/[0.06] rounded-2xl overflow-hidden">
@@ -122,16 +118,9 @@ export default function EventCard({ event }: { event: Event }) {
               {tag.toUpperCase()}
             </span>
           ))}
-          <span
-            className="text-[10px] font-bold px-2.5 py-1 rounded-full"
-            style={{
-              backgroundColor: type.color + "18",
-              color: type.color,
-              border: `1px solid ${type.color}40`,
-            }}
-          >
-            {type.label}
-          </span>
+          
+          <EventTag type={mappedType} />
+          
         </div>
       </div>
     </div>

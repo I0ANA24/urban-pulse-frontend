@@ -3,37 +3,9 @@
 import { useEffect, useState, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import EventCard from "@/components/EventCard";
-import { Event } from "@/types/Event";
+import { Event, EventType } from "@/types/Event";
 import Image from "next/image";
-
-type FilterType = {
-  title: string;
-  textColor: string;
-  bgColor: string;
-};
-
-const FILTERS: FilterType[] = [
-  {
-    title: "GENERAL",
-    textColor: "#4D3B03",
-    bgColor: "#FFF081",
-  },
-  {
-    title: "EMERGENCY",
-    textColor: "#FFFFFF",
-    bgColor: "#A53A3A",
-  },
-  {
-    title: "SKILL",
-    textColor: "#04007D",
-    bgColor: "#BEDCF5",
-  },
-  {
-    title: "LEND",
-    textColor: "#023612",
-    bgColor: "#4ADE80",
-  },
-];
+import { EVENT_TAG_STYLES } from "@/lib/constants";
 
 export default function DashboardPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -74,15 +46,16 @@ export default function DashboardPage() {
     activeFilter === "ALL"
       ? events
       : events.filter((e) => {
-          const typeMap: Record<number, string> = {
-            0: "GENERAL",
-            1: "EMERGENCY",
-            2: "SKILL",
-            3: "LEND",
+          const typeMap: Record<number, EventType> = {
+            0: "General",
+            1: "Emergency",
+            2: "Skill",
+            3: "Lend",
           };
-          const typeName =
-            typeof e.type === "number" ? typeMap[e.type] : e.type.toUpperCase();
-          return typeName === activeFilter;
+          const mappedType =
+            typeof e.type === "number" ? typeMap[e.type] : e.type;
+          
+          return EVENT_TAG_STYLES[mappedType]?.title === activeFilter;
         });
 
   return (
@@ -129,19 +102,24 @@ export default function DashboardPage() {
             }}
             style={{ scrollbarWidth: "none" }}
           >
-            {FILTERS.map((filter) => (
-              <button
-                key={filter.title}
-                onClick={() => setActiveFilter(filter.title)}
-                className="shrink-0 w-25 h-11 rounded-[10px] text-xs font-bold snap-start cursor pointer"
-                style={{
-                  backgroundColor: filter.bgColor,
-                  color: filter.textColor,
-                }}
-              >
-                {filter.title}
-              </button>
-            ))}
+            {(Object.keys(EVENT_TAG_STYLES) as EventType[]).map((typeKey) => {
+              const filter = EVENT_TAG_STYLES[typeKey];
+              return (
+                <button
+                  key={filter.title}
+                  onClick={() => setActiveFilter(activeFilter === filter.title ? "ALL" : filter.title)}
+                  className={`shrink-0 w-25 h-11 rounded-[10px] text-xs font-bold snap-start transition-opacity ${
+                    activeFilter === "ALL" || activeFilter === filter.title ? "opacity-100" : "opacity-40"
+                  }`}
+                  style={{
+                    backgroundColor: filter.bgColor,
+                    color: filter.textColor,
+                  }}
+                >
+                  {filter.title}
+                </button>
+              );
+            })}
           </div>
 
           {/* right fade */}
