@@ -8,25 +8,35 @@ import CardContent from "./card/CardContent";
 import CardActions from "./card/CardActions";
 import CardFooter from "./card/CardFooter";
 
+interface EventCardProps {
+  event: Event;
+  isMyPost?: boolean;
+  onDelete?: (id: number) => void;
+}
+
 function getInitials(email: string) {
   return email?.split("@")[0]?.slice(0, 2).toUpperCase() ?? "UP";
 }
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
   return `${day}.${month}.${year} \u00A0 ${hours}:${minutes}`;
 }
 
-export default function EventCard({ event }: { event: Event }) {
+export default function EventCard({
+  event,
+  isMyPost,
+  onDelete,
+}: EventCardProps) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [likes, setLikes] = useState(32); 
+  const [likes, setLikes] = useState(32);
 
   const handleLike = () => {
     setLiked(!liked);
@@ -34,32 +44,37 @@ export default function EventCard({ event }: { event: Event }) {
   };
 
   const typeMap: Record<number, EventType> = {
-    0: "General", 1: "Emergency", 2: "Skill", 3: "Lend",
+    0: "General",
+    1: "Emergency",
+    2: "Skill",
+    3: "Lend",
   };
-  const mappedType = typeof event.type === "number" ? typeMap[event.type] : event.type;
+  const mappedType =
+    typeof event.type === "number" ? typeMap[event.type] : event.type;
 
   return (
-    <div className="w-full bg-[#222222] rounded-[32px] overflow-hidden flex flex-col mb-4 relative">
-      
-      <CardHeader 
+    <div className="w-full bg-[#222222] rounded-4xl overflow-hidden flex flex-col mb-4 relative">
+      <CardHeader
         initials={getInitials(event.createdByEmail)}
         name={event.createdByEmail?.split("@")[0] ?? "Unknown"}
         date={formatDate(event.createdAt)}
-        isVerifiedUser={true} 
+        isVerifiedUser={true}
+        isMyPost={isMyPost}
+        onDelete={() => onDelete && onDelete(event.id)}
       />
 
       <CardMedia imageUrl={event.imageUrl} />
 
-      <div className="bg-[#222222] -mt-4 z-10 rounded-t-[24px]">
-        <CardContent 
-          title={event.title} 
-          description={event.description} 
-          isVerified={mappedType === "Emergency"} 
+      <div className="bg-[#222222] -mt-4 z-10 rounded-t-3xl">
+        <CardContent
+          title={event.title}
+          description={event.description}
+          isVerified={mappedType === "Emergency"}
         />
 
         <CardActions type={mappedType} />
 
-        <CardFooter 
+        <CardFooter
           likes={likes}
           liked={liked}
           onLike={handleLike}
@@ -68,7 +83,6 @@ export default function EventCard({ event }: { event: Event }) {
           type={mappedType}
         />
       </div>
-
     </div>
   );
 }

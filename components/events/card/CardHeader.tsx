@@ -1,4 +1,4 @@
-import { MoreVertical, BadgeCheck } from "lucide-react";
+import { MoreVertical, BadgeCheck, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface CardHeaderProps {
@@ -6,9 +6,18 @@ interface CardHeaderProps {
   name: string;
   date: string;
   isVerifiedUser?: boolean;
+  isMyPost?: boolean;
+  onDelete?: () => void;
 }
 
-export default function CardHeader({ initials, name, date, isVerifiedUser = true }: CardHeaderProps) {
+export default function CardHeader({
+  initials,
+  name,
+  date,
+  isVerifiedUser = true,
+  isMyPost,
+  onDelete,
+}: CardHeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -20,35 +29,49 @@ export default function CardHeader({ initials, name, date, isVerifiedUser = true
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
             <span className="text-white text-sm font-bold">{name}</span>
-            {isVerifiedUser && <BadgeCheck size={16} className="text-green-400 fill-green-400/20" />}
+            {isVerifiedUser && (
+              <BadgeCheck
+                size={16}
+                className="text-green-400 fill-green-400/20"
+              />
+            )}
           </div>
           <span className="text-white/40 text-xs">{date}</span>
         </div>
       </div>
 
-      <div className="relative">
-        <button 
-          onClick={() => setShowMenu(!showMenu)} 
-          className="p-1 transition-colors hover:text-white/70"
+      {isMyPost ? (
+        <button
+          onClick={onDelete}
+          className="p-1.5 bg-red-emergency/20 rounded-md transition-colors hover:bg-red-emergency/40"
         >
-          <MoreVertical size={20} className="text-white" />
+          <Trash2 size={18} className="text-red-emergency" />
         </button>
+      ) : (
+        <div className="relative">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="p-1 transition-colors hover:text-white/70"
+          >
+            <MoreVertical size={20} className="text-white" />
+          </button>
 
-        {/* meniul dropdown pentru report */}
-        {showMenu && (
-          <div className="absolute right-0 top-full mt-2 bg-[#1A1A1A] border border-white/10 rounded-xl shadow-2xl overflow-hidden w-28 z-50">
-            <button
-              onClick={() => {
-                console.log("Report action triggered");
-                setShowMenu(false);
-              }}
-              className="w-full text-center px-4 py-3 text-[#A53A3A] font-bold text-sm hover:bg-white/5 transition-colors"
-            >
-              Report
-            </button>
-          </div>
-        )}
-      </div>
+          {/* meniul dropdown pentru report */}
+          {showMenu && (
+            <div className="absolute right-0 top-full mt-2 bg-[#1A1A1A] border border-white/10 rounded-xl shadow-2xl overflow-hidden w-28 z-50">
+              <button
+                onClick={() => {
+                  console.log("Report action triggered");
+                  setShowMenu(false);
+                }}
+                className="w-full text-center px-4 py-3 text-red-emergency font-bold text-sm hover:bg-white/5 transition-colors"
+              >
+                Report
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
