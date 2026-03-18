@@ -26,26 +26,33 @@ export default function DashboardBanner({
   const [weather, setWeather] = useState<WeatherData | null>(null);
 
   useEffect(() => {
-    const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
-    fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=Iasi,RO&units=metric&appid=${apiKey}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        const description = data.weather[0].description as string;
-        const isSevere = severeConditions.some((c) =>
-          description.toLowerCase().includes(c)
-        );
-        setWeather({
-          temp: Math.round(data.main.temp),
-          description:
-            description.charAt(0).toUpperCase() + description.slice(1),
-          icon: data.weather[0].icon,
-          isSevere,
-        });
-        onSevereWeather?.(isSevere);
-      })
-      .catch(console.error);
+  const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+  
+    const fetchWeather = () => {
+      fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=Iasi,RO&units=metric&appid=${apiKey}`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          const description = data.weather[0].description as string;
+          const isSevere = severeConditions.some((c) =>
+            description.toLowerCase().includes(c)
+          );
+          setWeather({
+            temp: Math.round(data.main.temp),
+            description: description.charAt(0).toUpperCase() + description.slice(1),
+            icon: data.weather[0].icon,
+            isSevere,
+          });
+          onSevereWeather?.(isSevere);
+        })
+        .catch(console.error);
+    };
+
+    fetchWeather();
+    const interval = setInterval(fetchWeather, 10 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
