@@ -36,14 +36,14 @@ export default function EditSkillsOrTR({ add, items, onItemsChange }: EditSkills
   };
 
   return (
-    <div className="w-full flex flex-col gap-3">
+    <div className="w-full flex flex-col gap-4 mt-2">
 
       {items.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
           {items.map((item, i) => (
             <div
               key={i}
-              className="w-full h-12 px-4 flex items-center justify-between bg-yellow-secondary rounded-[10px]"
+              className="w-full h-12 px-4 flex items-center justify-between bg-yellow-secondary rounded-[10px] overflow-hidden"
             >
               <span className="text-black">{item}</span>
               <button onClick={() => handleRemove(i)} className="text-red-emergency hover:text-secondary transition-colors duration-200 cursor-pointer">
