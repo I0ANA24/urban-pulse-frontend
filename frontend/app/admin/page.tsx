@@ -1,13 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import DonutChart from "@/components/admin/DonutChart";
 import StatBar from "@/components/admin/StatBar";
 import OverviewCard from "@/components/admin/OverviewCard";
+import AddEventModal from "@/components/admin/AddEventModal";
 
-// ── Mock data — înlocuiește cu fetch-uri reale din API ──
 const mockStats = {
   flaggedUsers: 10,
   flaggedContent: 3,
@@ -34,14 +35,22 @@ const generalActivities = {
 // ──────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+
   const donutSegments = [
     { value: mockStats.flaggedUsersPercent, color: "#C0392B" },
     { value: mockStats.flaggedContentPercent, color: "#F5D63D" },
     { value: mockStats.resolvedPercent, color: "#4ade80" },
   ];
 
+  const handleSaveEvent = (eventText: string) => {
+    console.log("Event saved:", eventText);
+    // Aici adaugi logica pentru a salva event-ul (API call, etc.)
+  };
+
   return (
     <div className="w-full flex flex-col gap-6 animate-fade-up">
+      {/* Spacer — împinge conținutul sub MainPageImage (15vh) */}
       <div className="h-[calc(15vh-24px)]" />
 
       {/* Title */}
@@ -54,7 +63,10 @@ export default function AdminDashboard() {
 
       {/* Event button — wide, bluish */}
       <div className="flex justify-center">
-        <button className="w-full bg-weather-nice rounded-2xl px-6 py-3.5 flex items-center justify-between transition-transform active:scale-[0.97] cursor-pointer">
+        <button 
+          onClick={() => setIsEventModalOpen(true)}
+          className="w-full bg-weather-nice rounded-2xl px-6 py-3.5 flex items-center justify-between transition-transform active:scale-[0.97] cursor-pointer"
+        >
           <span className="text-white font-semibold text-base">Event</span>
           <Plus size={22} className="text-white" />
         </button>
@@ -125,6 +137,13 @@ export default function AdminDashboard() {
 
       {/* Bottom spacing */}
       <div className="h-4" />
+
+      {/* Add Event Modal */}
+      <AddEventModal
+        isOpen={isEventModalOpen}
+        onClose={() => setIsEventModalOpen(false)}
+        onSave={handleSaveEvent}
+      />
     </div>
   );
 }
