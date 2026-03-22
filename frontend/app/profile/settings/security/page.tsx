@@ -115,14 +115,14 @@ export default function SecurityPage() {
 
         {success && (
           <div className="w-full px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-2xl">
-            <p className="text-green-400 text-sm">{success}</p>
+            <p className="text-green-light text-sm">{success}</p>
           </div>
         )}
 
         <button
           onClick={handleChangePassword}
           disabled={loading}
-          className="w-full py-4 rounded-2xl font-bold text-sm transition-all bg-yellow-primary text-black disabled:opacity-50"
+          className="w-55 h-10 mx-auto rounded-2xl text-sm transition-all bg-green-light font-medium text-black disabled:opacity-50"
         >
           {loading ? "Updating..." : "Update Password"}
         </button>
