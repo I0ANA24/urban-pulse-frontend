@@ -7,12 +7,14 @@ interface PortalModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
+  contentClassName?: string;
 }
 
 export default function PortalModal({
   isOpen,
   onClose,
   children,
+  contentClassName,
 }: PortalModalProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -36,7 +38,10 @@ export default function PortalModal({
       onClick={onClose}
     >
       <div
-        className="bg-secondary w-full rounded-2xl overflow-hidden border border-white/10"
+        className={
+          contentClassName ??
+          "bg-secondary w-full rounded-2xl overflow-hidden border border-white/10"
+        }
         onClick={(e) => e.stopPropagation()}
       >
         {children}
