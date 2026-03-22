@@ -23,7 +23,8 @@ export default function ProfilePage() {
       .then((data) => setProfile(data));
   }, []);
 
-  const displayName = profile?.fullName ?? profile?.email?.split("@")[0] ?? "User";
+  const displayName =
+    profile?.fullName ?? profile?.email?.split("@")[0] ?? "User";
 
   return (
     <div className="w-full flex flex-col gap-12 mt-7">
@@ -51,37 +52,16 @@ export default function ProfilePage() {
             )}
           </h1>
 
-          <div className="flex justify-center items-center rounded-full px-3 py-1.5 h-8 bg-linear-to-b from-[#FFFADC]/50 to-[#FFF197]/50 shadow-[0px_11.3915px_22.3363px_rgba(255,227,42,0.19),inset_0px_-2px_1px_rgba(255,241,151,0.4)] backdrop-blur-[2px]">
-            {[1, 2, 3].map((i) => (
-              <svg
-                key={`full-${i}`}
-                className="w-5 h-5 text-yellow-primary drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.368-2.447a1 1 0 00-1.175 0l-3.368 2.447c-.784.57-1.838-.197-1.539-1.118l1.286-3.957a1 1 0 00-.364-1.118L4.053 9.384c-.783-.57-.38-1.81.588-1.81h4.161a1 1 0 00.951-.69l1.286-3.957z"
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                />
-              </svg>
-            ))}
-            {[1, 2].map((i) => (
-              <svg
-                key={`empty-${i}`}
-                className="w-5 h-5 text-yellow-primary"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.368-2.447a1 1 0 00-1.175 0l-3.368 2.447c-.784.57-1.838-.197-1.539-1.118l1.286-3.957a1 1 0 00-.364-1.118L4.053 9.384c-.783-.57-.38-1.81.588-1.81h4.161a1 1 0 00.951-.69l1.286-3.957z"
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                />
-              </svg>
-            ))}
+          <div className="flex justify-center items-center rounded-full px-4 py-1 bg-linear-to-b from-[#FFFADC]/50 to-[#FFF197]/50 shadow-[0px_11.3915px_22.3363px_rgba(255,227,42,0.19),inset_0px_-2px_1px_rgba(255,241,151,0.4)] backdrop-blur-[2px] border border-yellow-primary">
+            <p className="font-montagu font-medium text-xs text-yellow-primary leading-3 text-shadow-lg text-shadow-neutral-600/50">
+              Trust
+              <br />
+              score
+            </p>
+            <div className="h-6 w-1 border-r border-yellow-primary mx-2"></div>
+            <p className="font-montagu text-xl text-yellow-primary font-bold text-center text-shadow-lg text-shadow-neutral-600/30 ml-3">
+              75%
+            </p>
           </div>
         </div>
       </section>
@@ -115,9 +95,11 @@ export default function ProfilePage() {
         </section>
 
         <section className="w-full min-h-25 border-2 border-yellow-primary rounded-2xl flex flex-col justify-center gap-2 items-baseline py-4 px-6 shadow-sm bg-[#1C1C1C]">
-          <h2 className="text-yellow-primary text-xl font-bold font-montagu">Skills</h2>
+          <h2 className="text-yellow-primary text-xl font-bold font-montagu">
+            Skills
+          </h2>
           {profile?.skills && profile.skills.length > 0 ? (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2 w-full">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 w-full overflow-hidden">
               {profile.skills.map((skill, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-yellow-primary flex-shrink-0"></span>
@@ -137,7 +119,7 @@ export default function ProfilePage() {
             Tools & Resources
           </h2>
           {profile?.tools && profile.tools.length > 0 ? (
-            <div className="flex flex-col gap-y-2">
+            <div className="w-full flex flex-col gap-y-2 overflow-hidden">
               {profile.tools.map((tool, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-yellow-primary"></span>
