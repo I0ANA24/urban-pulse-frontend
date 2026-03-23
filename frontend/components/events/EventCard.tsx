@@ -15,6 +15,10 @@ interface EventCardProps {
   event: Event;
   isMyPost?: boolean;
   onDelete?: (id: number) => void;
+  /** Admin: număr de flag-uri (activează modul admin pe footer) */
+  flagCount?: number;
+  /** Admin: callback la click pe "View insights" */
+  onViewInsights?: (eventId: number) => void;
 }
 
 function getInitials(email: string) {
@@ -36,6 +40,8 @@ export default function EventCard({
   event,
   isMyPost,
   onDelete,
+  flagCount,
+  onViewInsights,
 }: EventCardProps) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -114,7 +120,9 @@ export default function EventCard({
     3: "Lend",
   };
   const mappedType =
-    typeof event.type === "number" ? typeMap[event.type] : event.type;
+    typeof event.type === "number"
+      ? typeMap[event.type]
+      : (event.type as EventType);
 
   return (
     <div className="w-full relative mb-4">
@@ -145,6 +153,12 @@ export default function EventCard({
           type={mappedType}
           comments={commentCount}
           onComment={() => setShowComments(true)}
+          flagCount={flagCount}
+          onViewInsights={
+            onViewInsights
+              ? () => onViewInsights(event.id)
+              : undefined
+          }
         />
       </div>
 
