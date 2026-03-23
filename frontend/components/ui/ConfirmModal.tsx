@@ -7,19 +7,12 @@ interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  /** Iconița din header (ex: <LogOut />, <Trash2 />) */
   icon: ReactNode;
-  /** Titlul afișat lângă icon (ex: "Log out", "Delete account") */
   title: string;
-  /** Textul bold+underline din întrebare (ex: "log out?", "delete your account?") */
   boldText: string;
-  /** Label buton confirmare */
   confirmLabel?: string;
-  /** Label buton anulare */
   cancelLabel?: string;
-  /** Arată loading pe butonul de confirm */
   loading?: boolean;
-  /** Conținut suplimentar între header și întrebare (ex: input Reason) */
   children?: ReactNode;
 }
 
@@ -37,30 +30,29 @@ export default function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <PortalModal isOpen={isOpen} onClose={onClose}>
-      {/* Header — icon + titlu red-emergency */}
-      <div className="flex items-center justify-center gap-2 py-4">
-        <span className="text-red-emergency [&>svg]:size-5 [&>svg]:stroke-[2]">
+      {/* Header — icon + title */}
+      <div className="flex items-center justify-center gap-2 py-5">
+        <span className="text-red-emergency [&>svg]:size-6 [&>svg]:stroke-2">
           {icon}
         </span>
-        <h2 className="text-base font-bold text-red-emergency">{title}</h2>
+        <h2 className="text-xl font-bold text-red-emergency">{title}</h2>
       </div>
 
       {/* Separator */}
-      <div className="h-px bg-white/10 mx-5" />
+      <div className="h-0.5 bg-white/10 mx-6" />
 
       {/* Body */}
-      <div className="px-5 py-5 flex flex-col gap-4">
-        {/* Conținut suplimentar (ex: Reason input la BanUser) */}
+      <div className="px-5 py-6 flex flex-col gap-6">
         {children}
 
-        {/* Întrebarea de confirmare */}
-        <p className="text-white text-sm leading-relaxed text-center">
+        {/* Question */}
+        <p className="text-white text-lg px-4 text-center">
           Are you sure you want to{" "}
           <span className="font-bold underline">{boldText}</span>
         </p>
 
-        {/* Butoane YES / NO */}
-        <div className="flex items-center justify-center mb-8 w-[80%] rounded-xl overflow-hidden h-10 mx-auto">
+        {/* YES / NO */}
+        <div className="flex items-center justify-center mb-4 w-[80%] rounded-xl overflow-hidden h-10 mx-auto">
           <button
             onClick={onConfirm}
             disabled={loading}

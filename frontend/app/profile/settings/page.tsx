@@ -60,8 +60,8 @@ export default function Settings() {
           <div className="w-full flex justify-center items-center">
             <Image
               src="/profile.png"
-              width={186}
-              height={175}
+              width={160}
+              height={160}
               alt="profile_picture"
             />
           </div>
@@ -78,56 +78,44 @@ export default function Settings() {
           </h1>
         </div>
 
-        <div className="w-full flex flex-col justify-center items-center gap-3 mb-10">
+        <div className="w-full flex flex-col justify-center items-center gap-3">
           <ProfileSettingsLink text="edit" />
           <ProfileSettingsLink text="myposts" />
           <ProfileSettingsLink text="personal" />
           <ProfileSettingsLink text="security" />
           <ProfileSettingsLink text="saved" />
           <ProfileSettingsLink text="preferences" />
+
+          {isAdmin && <ProfileSettingsLink text="admin" />}
         </div>
 
-        <div className="w-full h-px bg-[#383838] my-2 -mb-1"></div>
+        <div className="w-full h-px bg-[#383838] my-2"></div>
 
-        <div className="w-full flex flex-col justify-center items-center gap-3 mb-10">
-          {isAdmin && (
-            <Link href="/admin" className="w-full">
-              <button className="w-full h-14 bg-secondary rounded-full px-5 flex justify-between items-center cursor-pointer">
-                <div className="flex justify-center items-center gap-4">
-                  <Satellite className="size-7 text-green-light" strokeWidth={2} />
-                  <span className="text-xl font-bold text-green-light">
-                    Admin Panel
-                  </span>
-                </div>
-                <ChevronRight className="size-7 text-green-light font-bold" />
-              </button>
-            </Link>
-          )}
-
+        <div className="w-full flex flex-col justify-center items-center gap-3">
           <button
             onClick={() => setShowLogoutConfirm(true)}
-            className="w-full h-14 bg-secondary rounded-full px-5 flex justify-between items-center cursor-pointer"
+            className="w-full h-13 rounded-full px-5 flex justify-between items-center cursor-pointer bg-secondary"
           >
             <div className="flex justify-center items-center gap-4">
-              <LogOut className="size-7 text-red-emergency" strokeWidth={2} />
-              <span className="text-xl font-bold text-red-emergency">
+              <LogOut className="size-6 text-red-emergency" strokeWidth={2} />
+              <span className="text-lg font-semibold text-red-emergency">
                 Log Out
               </span>
             </div>
-            <ChevronRight className="size-7 text-red-emergency font-bold" />
+            <ChevronRight className="size-6 text-red-emergency font-bold" />
           </button>
 
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="w-full h-14 bg-secondary rounded-full px-5 flex justify-between items-center cursor-pointer"
+            className="w-full h-13 rounded-full px-5 flex justify-between items-center cursor-pointer bg-secondary"
           >
             <div className="flex justify-center items-center gap-4">
-              <Trash2 className="size-7 text-red-emergency" strokeWidth={2} />
-              <span className="text-xl font-bold text-red-emergency">
+              <Trash2 className="size-6 text-red-emergency" strokeWidth={2} />
+              <span className="text-lg font-semibold text-red-emergency">
                 Delete Account
               </span>
             </div>
-            <ChevronRight className="size-7 text-red-emergency font-bold" />
+            <ChevronRight className="size-6 text-red-emergency font-bold" />
           </button>
         </div>
       </div>
