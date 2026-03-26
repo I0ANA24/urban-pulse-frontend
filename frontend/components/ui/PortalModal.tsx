@@ -40,7 +40,7 @@ export default function PortalModal({
       <div
         className={
           contentClassName ??
-          "bg-secondary w-full max-w-80 rounded-2xl overflow-hidden"
+          "bg-secondary w-full max-w-80 rounded-[20] overflow-hidden"
         }
         onClick={(e) => e.stopPropagation()}
       >

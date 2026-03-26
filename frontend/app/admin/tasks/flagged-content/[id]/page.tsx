@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Check, TriangleAlert } from "lucide-react";
+import { Check, ClipboardCheck, TriangleAlert } from "lucide-react";
 import EventTag from "@/components/ui/EventTag";
 import UserReportCard from "@/components/admin/UserReportCard";
 import PortalModal from "@/components/ui/PortalModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { EventType } from "@/types/Event";
 import { Trash2 } from "lucide-react";
+import ResolveTaskModal from "@/components/ui/ResolveTaskModal";
 
 interface Report {
   id: string;
@@ -17,7 +18,7 @@ interface Report {
   reporterAvatar: string;
   date: string;
   time: string;
-  category: string;
+  title: string;
   description: string;
 }
 
@@ -35,7 +36,7 @@ const mockPostData = {
       reporterAvatar: "/profile.png",
       date: "05.03.2026",
       time: "7:20",
-      category: "anskdfcbkvank",
+      title: "anskdfcbkvank",
       description: "Sorry, i don't know how to exit this window",
     },
   ] as Report[],
@@ -50,7 +51,7 @@ export default function FlaggedContentDetailPage() {
   const handleDismiss = () => {
     setShowResolveModal(false);
     setResolved(true);
-    setTimeout(() => router.back(), 800);
+    setTimeout(() => router.back(), 500);
   };
 
   const handleOpenDeleteConfirm = () => {
@@ -63,7 +64,7 @@ export default function FlaggedContentDetailPage() {
     setResolved(true);
     // TODO: API call to delete post
     console.log("Post deleted");
-    setTimeout(() => router.back(), 800);
+    setTimeout(() => router.back(), 500);
   };
 
   return (
@@ -86,69 +87,74 @@ export default function FlaggedContentDetailPage() {
 
           <button
             onClick={() => setShowResolveModal(true)}
-            disabled={resolved}
-            className={`p-3 rounded-full transition-all ${
-              resolved
-                ? "bg-green-500"
-                : "bg-green-light hover:bg-green-600 active:scale-95"
+            className={`p-3 rounded-full transition-all bg-green-light hover:bg-green-light/90 active:scale-95 cursor-pointer z-100"
             }`}
           >
-            <Check size={24} className="text-white" strokeWidth={3} />
+            <ClipboardCheck
+              size={26}
+              className="text-black"
+              strokeWidth={1.8}
+            />
           </button>
         </div>
 
         {/* ── Post detail card ── */}
-        <div className="bg-secondary rounded-2xl px-6 py-5 flex flex-col gap-4">
+        <div className="bg-secondary rounded-[20] p-5 flex flex-col gap-4">
           {/* Posted by */}
-          <div className="flex items-center gap-3">
-            <span className="text-white font-bold text-sm">Posted by:</span>
-            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+          <div className="flex items-center gap-6">
+            <span className="text-white font-bold text-base">Posted by:</span>
+            <div className="w-10 h-10 -mr-4 rounded-full overflow-hidden shrink-0">
               <Image
                 src={mockPostData.avatar}
                 alt={mockPostData.postedBy}
-                width={40}
-                height={40}
+                width={35}
+                height={35}
                 className="object-cover w-full h-full"
               />
             </div>
-            <span className="text-white font-semibold text-sm">
+            <span className="text-white font-semibold text-base">
               {mockPostData.postedBy}
             </span>
           </div>
 
           {/* Separator */}
-          <div className="h-px bg-white/20" />
+          <div className="h-px bg-white" />
 
           {/* Description */}
           <div className="flex flex-col gap-2">
-            <h3 className="text-white font-bold text-sm">Description:</h3>
+            <h3 className="text-white font-bold text-base">Description:</h3>
             <p className="text-white text-sm leading-relaxed">
               {mockPostData.description}
             </p>
           </div>
 
           {/* Separator */}
-          <div className="h-px bg-white/20" />
+          <div className="h-px bg-white" />
 
           {/* Tag */}
           <div className="flex items-center gap-3">
-            <span className="text-white font-bold text-sm">Tag:</span>
+            <span className="text-white font-bold text-base">Tag:</span>
             <EventTag type={mockPostData.tag} />
           </div>
 
           {/* Posted on */}
           <div className="flex items-center gap-2">
-            <span className="text-white font-bold text-sm">Posted on:</span>
-            <span className="text-yellow-primary font-semibold text-sm">
+            <span className="text-white font-bold text-base">Posted on:</span>
+            <span className="text-yellow-primary text-base">
               {mockPostData.postedOn}
             </span>
           </div>
         </div>
 
         {/* ── Number of reports ── */}
-        <div className="flex items-center gap-2 px-2">
-          <TriangleAlert size={24} className="text-red-emergency" />
-          <span className="text-red-emergency font-semibold text-base">
+        <div className="flex items-center gap-2 px-2 mt-8">
+          <TriangleAlert
+            size={36}
+            fill="#A53A3A"
+            color="black"
+            className="text-red-emergency"
+          />
+          <span className="text-red-emergency text-xl">
             Number of reports: {mockPostData.reports.length}
           </span>
         </div>
@@ -162,7 +168,7 @@ export default function FlaggedContentDetailPage() {
               reporterAvatar={report.reporterAvatar}
               date={report.date}
               time={report.time}
-              category={report.category}
+              title={report.title}
               description={report.description}
             />
           ))}
@@ -170,7 +176,16 @@ export default function FlaggedContentDetailPage() {
       </div>
 
       {/* ── Resolve Task Modal ── */}
-      <PortalModal
+      <ResolveTaskModal
+        isOpen={showResolveModal}
+        onClose={() => setShowResolveModal(false)}
+        handleDismiss={handleDismiss}
+        handleOpenDeleteConfirm={handleOpenDeleteConfirm}
+        greenButtonText="Decline"
+        redButtonText="Delete post"
+      />
+
+      {/* <PortalModal
         isOpen={showResolveModal}
         onClose={() => setShowResolveModal(false)}
       >
@@ -191,7 +206,7 @@ export default function FlaggedContentDetailPage() {
             Delete post
           </button>
         </div>
-      </PortalModal>
+      </PortalModal> */}
 
       {/* ── Delete Post Confirmation Modal ── */}
       <ConfirmModal

@@ -7,7 +7,7 @@ interface UserReportCardProps {
   reporterAvatar: string;
   date: string;
   time: string;
-  category: string;
+  title: string;
   description: string;
 }
 
@@ -16,24 +16,24 @@ export default function UserReportCard({
   reporterAvatar,
   date,
   time,
-  category,
+  title,
   description,
 }: UserReportCardProps) {
   return (
-    <div className="bg-[#2a2a2a] rounded-2xl p-4 flex flex-col gap-3">
+    <div className="bg-secondary rounded-[20] p-4 flex flex-col gap-3">
       {/* Reporter info */}
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-white overflow-hidden flex-shrink-0">
+        <div className="w-9 h-9 rounded-full bg-white overflow-hidden shrink-0">
           <Image
             src={reporterAvatar}
             alt={reporterName}
-            width={48}
-            height={48}
+            width={35}
+            height={35}
             className="w-full h-full object-cover"
           />
         </div>
         <div className="flex flex-col flex-1">
-          <span className="text-white font-semibold text-base">
+          <span className="text-white font-bold text-base">
             {reporterName}
           </span>
           <span className="text-white/40 text-xs">
@@ -42,14 +42,16 @@ export default function UserReportCard({
         </div>
       </div>
 
-      {/* Category */}
-      <div className="bg-[#1a1a1a] border border-[#C0392B] rounded-xl px-4 py-2.5">
-        <span className="text-white/90 text-sm">{category}</span>
+      <div className="h-px bg-white/40 mb-2" />
+
+      {/* Title */}
+      <div className="bg-red-emergency/50 rounded-[10] px-4 py-2.5">
+        <span className="text-white">{title}</span>
       </div>
 
       {/* Description */}
-      <div className="bg-[#3a3a3a] rounded-xl px-4 py-3">
-        <p className="text-white/80 text-sm leading-relaxed">
+      <div className="bg-third rounded-[20] p-4">
+        <p className="text-white">
           {description}
         </p>
       </div>

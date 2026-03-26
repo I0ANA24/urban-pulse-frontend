@@ -64,7 +64,7 @@ export default function FlaggedUsersPage() {
           >
             <div className="flex items-center gap-4">
               {/* Avatar */}
-              <div className="w-14 h-14 rounded-full bg-white overflow-hidden flex-shrink-0">
+              <div className="w-14 h-14 rounded-full bg-white overflow-hidden shrink-0">
                 <Image
                   src={user.avatar}
                   alt={user.name}
