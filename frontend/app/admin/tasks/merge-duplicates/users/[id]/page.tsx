@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { BadgeCheck, Check } from "lucide-react";
 import { PiSealCheck } from "react-icons/pi";
+import GoBackButton from "@/components/ui/GoBackButton";
 
 // ── Types ──
 interface DuplicateUserAccount {
@@ -53,18 +54,7 @@ export default function ReviewDuplicateUsersPage() {
     <div className="w-full flex flex-col gap-6 animate-fade-up pb-32">
       {/* Header — back button */}
       <div className="flex items-center">
-        <button
-          onClick={() => router.back()}
-          className="cursor-pointer hover:scale-105 active:scale-95 z-10"
-        >
-          <Image
-            src="/undo.svg"
-            alt="go_back"
-            width={69}
-            height={49}
-            className="-ml-2"
-          />
-        </button>
+        <GoBackButton />
       </div>
 
       {/* Matches info */}
@@ -104,6 +94,7 @@ export default function ReviewDuplicateUsersPage() {
                   : "border-yellow-primary"
               }`}
             >
+              {/* Checkbox */}
               <div className="w-full flex justify-end -mb-8">
                 <div
                   className={`w-7 h-7 bg-white rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
@@ -144,9 +135,9 @@ export default function ReviewDuplicateUsersPage() {
                     {account.isVerified && (
                       <div className="flex items-center gap-1.5">
                         <BadgeCheck
-                          size={24}
-                          className="text-green-light fill-green-light [&>path:last-child]:stroke-black [&>path:last-child]:scale-125 [&>path:last-child]:origin-center"
-                        />
+                          size={22}
+                          className="text-green-light fill-green-light/20"
+                        />{" "}
                         <span className="font-bold">Verified Neighbour</span>
                       </div>
                     )}

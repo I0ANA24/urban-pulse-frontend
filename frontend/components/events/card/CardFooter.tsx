@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Bookmark, Flag } from "lucide-react";
+import { Heart, MessageCircle, Bookmark, Flag, ThumbsUp } from "lucide-react";
 import EventTag from "@/components/ui/EventTag";
 import { EventType } from "@/types/Event";
 
@@ -62,7 +62,7 @@ export default function CardFooter({
           onClick={onLike}
           className="flex items-center gap-1.5 transition-transform active:scale-90"
         >
-          <Heart
+          <ThumbsUp
             size={22}
             className={
               liked ? "fill-green-light text-green-light" : "text-green-light"

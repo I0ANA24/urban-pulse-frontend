@@ -117,10 +117,13 @@ export default function EventCard({
 
   const handleLike = async () => {
     const token = localStorage.getItem("token");
-    const res = await fetch(`http://localhost:5248/api/event/${event.id}/like`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetch(
+      `http://localhost:5248/api/event/${event.id}/like`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     const data = await res.json();
     setLikes(data.count);
     setLiked(data.liked);
@@ -134,7 +137,10 @@ export default function EventCard({
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ otherUserId: event.createdByUserId, eventId: event.id }),
+      body: JSON.stringify({
+        otherUserId: event.createdByUserId,
+        eventId: event.id,
+      }),
     });
     const data = await res.json();
     router.push(`/chat-conversation/${data.conversationId}`);
@@ -174,7 +180,9 @@ export default function EventCard({
         imageUrl={event.imageUrl}
       />
       <CardMedia imageUrl={event.imageUrl} />
-      <div className={`bg-secondary -mt-4 z-10 rounded-4xl ${event.imageUrl ? "rounded-t-4xl" : "rounded-t-none"} p-5`}>
+      <div
+        className={`bg-secondary -mt-4 z-10 rounded-4xl ${event.imageUrl ? "rounded-t-4xl" : "rounded-t-none"} p-5`}
+      >
         <CardContent
           description={event.description}
           isVerified={mappedType === "Emergency"}
@@ -199,21 +207,21 @@ export default function EventCard({
           onComment={() => setShowComments(true)}
           flagCount={flagCount}
           onViewInsights={
-            onViewInsights
-              ? () => onViewInsights(event.id)
-              : undefined
+            onViewInsights ? () => onViewInsights(event.id) : undefined
           }
           isMyPost={isOwner}
         />
       </div>
 
-      {showComments && typeof window !== "undefined" && createPortal(
-        <CommentsSheet
-          eventId={event.id}
-          onClose={() => setShowComments(false)}
-        />,
-        document.body
-      )}
+      {showComments &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <CommentsSheet
+            eventId={event.id}
+            onClose={() => setShowComments(false)}
+          />,
+          document.body,
+        )}
     </div>
   );
 }

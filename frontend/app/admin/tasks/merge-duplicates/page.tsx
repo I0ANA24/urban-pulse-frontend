@@ -128,13 +128,15 @@ export default function MergeDuplicatesPage() {
                     </div>
 
                     {/* Name */}
-                    <span className="text-white text-xl">
-                      {user.name}
-                    </span>
+                    <span className="text-white text-xl">{user.name}</span>
                   </div>
 
                   {/* Duplicate users icon */}
-                  <HiUsers size={46} fill="#FFF081" className="text-yellow-primary" />
+                  <HiUsers
+                    size={46}
+                    fill="#FFF081"
+                    className="text-yellow-primary"
+                  />
                 </div>
 
                 {/* Matches count */}
@@ -165,16 +167,14 @@ export default function MergeDuplicatesPage() {
             {mockDuplicatePosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-[#1e1e1e] border-2 border-yellow-primary rounded-2xl p-5 flex flex-col gap-3"
+                className="bg-secondary border border-yellow-primary rounded-[20] p-5 flex flex-col gap-3"
               >
                 {/* Post preview text */}
-                <p className="text-white font-medium text-base leading-relaxed pr-16">
-                  {post.preview}
-                </p>
+                <p className="line-clamp-2 pr-16">{post.preview}</p>
 
                 {/* Matches count + duplicate posts icon */}
-                <div className="flex items-center justify-between">
-                  <p className="text-green-light font-semibold text-base">
+                <div className="flex items-center justify-between -my-1">
+                  <p className="text-green-light text-xl">
                     {post.matchesCount} matches
                   </p>
 
@@ -188,7 +188,7 @@ export default function MergeDuplicatesPage() {
                 {/* Review button */}
                 <button
                   onClick={() => handleReviewPost(post.id)}
-                  className="self-start bg-green-light hover:bg-green-light/80 active:scale-95 transition-all text-white font-bold text-sm px-8 py-2.5 rounded-full cursor-pointer"
+                  className="w-36 h-8.5 self-start bg-green-light hover:bg-green-light/80 active:scale-95 transition-all text-black font-bold rounded-full cursor-pointer"
                 >
                   Review
                 </button>
