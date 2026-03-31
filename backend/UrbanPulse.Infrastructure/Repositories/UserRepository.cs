@@ -45,5 +45,10 @@ namespace UrbanPulse.Infrastructure.Repositories
             await _context.Users
                 .Where(u => u.Skills != null && u.Skills != "" && u.Address != null && u.Address != "")
                 .ToListAsync();
+
+        public async Task<List<User>> GetUsersWithToolsAsync() =>
+            await _context.Users
+                .Where(u => u.Tools != null && u.Tools != "" && u.Address != null && u.Address != "")
+                .ToListAsync();
     }
 }

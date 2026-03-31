@@ -11,5 +11,6 @@ namespace UrbanPulse.Core.Interfaces
         Task DeleteAsync(User user);
         Task UpdateAsync(User user);
         Task<List<User>> GetUsersWithSkillsAsync();
+        Task<List<User>> GetUsersWithToolsAsync();
     }
 }

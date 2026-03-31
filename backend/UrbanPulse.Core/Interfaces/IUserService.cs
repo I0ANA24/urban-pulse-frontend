@@ -9,5 +9,6 @@ namespace UrbanPulse.Core.Interfaces
         Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto dto);
         Task DeleteAccountAsync(int userId);
         Task<List<UserProfileDto>> GetUsersWithSkillsAsync();
+        Task<List<UserProfileDto>> GetUsersWithToolsAsync();
     }
 }

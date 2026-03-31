@@ -36,6 +36,13 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
+    [HttpGet("with-tools")]
+    public async Task<IActionResult> GetUsersWithTools()
+    {
+        var users = await _userService.GetUsersWithToolsAsync();
+        return Ok(users);
+    }
+
     [HttpGet("my-posts")]
     public async Task<IActionResult> GetMyPosts()
     {
