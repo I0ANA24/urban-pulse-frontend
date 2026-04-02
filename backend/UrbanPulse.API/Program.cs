@@ -54,6 +54,8 @@ namespace UrbanPulse_Backend
             builder.Services.AddScoped<ICommentRepository, CommentRepository>();
             builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
             builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
 
             // SignalR
             builder.Services.AddSignalR();
@@ -122,6 +124,7 @@ namespace UrbanPulse_Backend
             app.MapControllers();
             app.UseStaticFiles();
             app.MapHub<EventHub>("/hubs/events");
+            app.MapHub<NotificationHub>("/hubs/notifications");
 
             app.Run();
         }
