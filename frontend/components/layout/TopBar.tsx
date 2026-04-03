@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, Home } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import GoBackButton from "../ui/GoBackButton";
 import ProfileRoundButton from "../ui/ProfileRoundButton";
 import { Plus } from "lucide-react";
+import HomeIcon from "../icons/navbar/HomeIcon";
 
 interface TopBarProps {
   back: boolean;
@@ -74,15 +75,19 @@ export default function TopBar({
       </div>
 
       {/* DESKTOP TopBar */}
-      <div
-        className="hidden lg:flex items-center justify-between h-23 -mx-6 -mt-6 mb-6 px-8 py-3 border-b border-white/20"
-        style={{
-          filter: "drop-shadow(0px 4px 8.4px rgba(0, 0, 0, 0.69))",
-        }}
-      >
+      <div className="hidden lg:flex items-center justify-between h-23 -mx-6 px-8 py-3 mb-6 border-b border-white/20">
         {/* Left — Branding */}
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <Home size={28} className="text-white mr-8" />
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-2"
+          onClick={() => {
+            const feed = document.getElementById("feed-scroll");
+            if (feed) {
+              feed.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+        >
+          <HomeIcon className="w-20 h-20" />
           <h1 className="font-montagu text-white text-3xl">UrbanPulse</h1>
           <span className="w-3 h-3 rounded-full bg-green-light" />
         </Link>

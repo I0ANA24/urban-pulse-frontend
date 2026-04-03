@@ -166,11 +166,13 @@ export default function DashboardPage() {
         });
 
   return (
-    <div className="w-full pb-[8vh] lg:pb-0">
+    <div className="w-full pb-[8vh] lg:pb-0 lg:flex-1 lg:min-h-0 lg:overflow-hidden">
+      {" "}
       {/* ── Desktop 3-column wrapper ── */}
-      <div className="lg:flex lg:gap-8 xl:gap-14 lg:items-start">
+      <div className="lg:flex lg:gap-8 xl:gap-14 lg:items-stretch lg:h-full lg:overflow-hidden">
+        {" "}
         {/* LEFT SIDEBAR — Desktop only */}
-        <aside className="hidden lg:flex lg:flex-col lg:flex-1 lg:sticky lg:top-8">
+        <aside className="hidden lg:flex lg:flex-col lg:flex-1">
           {/* Add Post — separated with extra gap */}
           <SidebarNavItem
             href="/addPost"
@@ -200,9 +202,12 @@ export default function DashboardPage() {
             />
           </div>
         </aside>
-
         {/* CENTER COLUMN — Feed */}
-        <div className="lg:flex-2 max-w-190">
+        <div
+          id="feed-scroll"
+          className="lg:flex-2 max-w-190 lg:h-full lg:overflow-y-auto lg:min-h-0"
+          style={{ scrollbarWidth: "none" }}
+        >
           <div className="w-full py-2 flex flex-col items-center gap-4 mb-4">
             {/* UrbanTitle — mobile only (on desktop it's in the TopBar) */}
             <div className="lg:hidden">
@@ -273,9 +278,8 @@ export default function DashboardPage() {
             ))}
           </div>
         </div>
-
         {/* RIGHT SIDEBAR — Desktop only */}
-        <aside className="hidden lg:flex lg:flex-1 lg:flex-col lg:gap-4 lg:sticky lg:top-8">
+        <aside className="hidden lg:flex lg:flex-1 lg:flex-col lg:gap-4">
           {/* Weather card */}
           <DesktopWeatherCard />
 
