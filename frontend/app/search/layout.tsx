@@ -8,7 +8,7 @@ export default function SearchLayout({
 }) {
   return (
     <Container>
-      <TopBar back={false} notifications={true} settings={false} addPost={true} />
+      <TopBar back={false} notifications={false} settings={false} addPost={false} />
       {children}
     </Container>
   );
