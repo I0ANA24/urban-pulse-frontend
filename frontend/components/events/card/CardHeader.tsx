@@ -39,8 +39,8 @@ export default function CardHeader({
           />
         </div>
         <div className="flex flex-col justify-center items-start">
-          <div className="flex items-center">
-            <p className="w-full font-bold lg:text-lg">Niklaus</p>
+          <div className="flex items-center gap-1">
+            <p className="font-bold lg:text-lg">{name}</p>
             {isVerifiedUser && (
               <BadgeCheck
                 size={20}
@@ -53,7 +53,6 @@ export default function CardHeader({
       </div>
       {/* menu */}
       <div className="relative flex justify-center items-center">
-        {/* meniul dropdown pentru report */}
         {isMyPost ? (
           <button
             onClick={onDelete}
