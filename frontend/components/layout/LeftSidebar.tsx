@@ -85,7 +85,7 @@ export default function LeftSidebar() {
 
       <Link
         href={"/pets"}
-        className={`flex items-center gap-5 h-11 px-4 rounded-xl transition-colors hover:bg-[#131313] ${pathname === "/pets" || pathname.startsWith("/pets/") ? "bg-[#131313]" : ""}`}
+        className={`flex items-center gap-5 pl-6 py-4 rounded-xl transition-colors hover:bg-[#131313] ${pathname === "/pets" || pathname.startsWith("/pets/") ? "bg-[#131313]" : ""}`}
       >
         <div className="size-11 rounded-full bg-green-light text-black flex justify-center items-center font-bold">
           <PawPrint size={24} strokeWidth={2} />
