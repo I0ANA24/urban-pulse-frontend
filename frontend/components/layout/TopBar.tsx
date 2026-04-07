@@ -155,7 +155,7 @@ export default function TopBar({ back, notifications, settings, addPost }: TopBa
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 top-full px-2 mt-3 w-56 bg-[#0F0F0F] border border-secondary rounded-2xl py-2 shadow-xl z-50">
+              <div className="absolute right-0 top-full px-2 mt-3 w-65 bg-[#0F0F0F] border border-secondary rounded-2xl py-2 shadow-xl z-50">
                 <button
                   onClick={() => { setDropdownOpen(false); router.push("/profile"); }}
                   className="flex items-center rounded-xl gap-3 w-full px-5 py-3 text-white hover:bg-white/5 transition-colors cursor-pointer"
@@ -174,7 +174,7 @@ export default function TopBar({ back, notifications, settings, addPost }: TopBa
                   <div className="px-4 pt-2 pb-2">
                     <button
                       onClick={() => { setDropdownOpen(false); router.push("/admin"); }}
-                      className="w-full bg-red-emergency hover:bg-red-emergency/80 text-white font-medium text-base py-2.5 rounded-full transition-colors cursor-pointer duration-100"
+                      className="w-full bg-red-emergency hover:bg-red-emergency/80 text-white text-lg py-1.5 rounded-full transition-colors cursor-pointer duration-100"
                     >
                       Admin dashboard
                     </button>
