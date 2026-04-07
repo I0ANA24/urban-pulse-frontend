@@ -69,12 +69,10 @@ export default function DashboardPage() {
         <div className="lg:hidden">
           <UrbanTitle />
         </div>
-
         {/* Severe weather banner */}
         {isSevereWeather && (
           <div className="sticky top-0 z-50 w-full animate-fade-up">
             <div className="absolute inset-0 bg-red-emergency rounded-2xl animate-ping opacity-30" />
-
             <div className="relative w-full bg-red-emergency rounded-2xl px-4 py-3 flex items-center justify-between gap-3 cursor-pointer hover:opacity-90 transition-opacity">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">📌</span>
@@ -104,31 +102,25 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
-
         {/* DashboardBanner — mobile only */}
         <div className="lg:hidden w-full">
           <DashboardBanner onSevereWeather={setIsSevereWeather} />
         </div>
-
         <EventFilters
           activeFilter={activeFilter}
           setActiveFilter={setActiveFilter}
         />
       </div>
-
       {/* Feed */}
       <div className="flex flex-col gap-4 mt-2">
         {loading && (
-          <p className="text-white/40 text-sm text-center mt-10">
-            Loading...
-          </p>
+          <p className="text-white/40 text-sm text-center mt-10">Loading...</p>
         )}
         {!loading && filteredEvents.length === 0 && (
           <p className="text-white/40 text-sm text-center mt-10">
             No events yet.
           </p>
         )}
-
         {filteredEvents.map((event) => (
           <EventCard key={event.id} event={event} />
         ))}

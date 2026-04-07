@@ -9,6 +9,7 @@ import GoBackButton from "../ui/GoBackButton";
 import ProfileRoundButton from "../ui/ProfileRoundButton";
 import { Plus } from "lucide-react";
 import { useSignalR } from "@/context/SignalRContext";
+import HomeIcon from "../icons/navbar/HomeIcon";
 
 interface TopBarProps {
   back: boolean;
@@ -124,7 +125,7 @@ export default function TopBar({ back, notifications, settings, addPost }: TopBa
             if (feed) feed.scrollTo({ top: 0, behavior: "smooth" });
           }}
         >
-          {/* <HomeIcon className="w-20 h-20" /> */}
+          <HomeIcon className="w-20 h-20" />
           <h1 className="font-montagu text-white text-3xl">UrbanPulse</h1>
           <span className="w-3 h-3 rounded-full bg-green-light" />
         </Link>
