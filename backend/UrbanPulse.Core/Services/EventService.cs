@@ -86,6 +86,8 @@ namespace UrbanPulse.Core.Services
             CreatedByUserId = ev.CreatedByUserId,
             CreatedByEmail = ev.CreatedByUser?.Email ?? string.Empty,
             CreatedByFullName = ev.CreatedByUser?.FullName,
+            CreatedByAvatarUrl = ev.CreatedByUser?.AvatarUrl,
+            IsVerifiedUser = ev.CreatedByUser?.IsVerified ?? false,
             CreatedAt = ev.CreatedAt,
             IsActive = ev.IsActive,
             IsCompleted = ev.IsCompleted

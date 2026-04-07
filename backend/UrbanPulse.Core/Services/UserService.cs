@@ -43,6 +43,16 @@ public class UserService : IUserService
         return users.Select(MapToDto).ToList();
     }
 
+    public async Task<string> UpdateAvatarAsync(int userId, string avatarUrl)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null) return string.Empty;
+        user.AvatarUrl = avatarUrl;
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userRepository.UpdateAsync(user);
+        return avatarUrl;
+    }
+
     public async Task<UserProfileDto?> UpdateProfileAsync(int userId, UpdateProfileDto dto)
     {
         var user = await _userRepository.GetByIdAsync(userId);
@@ -88,6 +98,7 @@ public class UserService : IUserService
         PhoneNumber = user.PhoneNumber,
         Address = user.Address,
         Bio = user.Bio,
+        AvatarUrl = user.AvatarUrl,
         Skills = string.IsNullOrWhiteSpace(user.Skills) ? new() : user.Skills.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList(),
         Tools = string.IsNullOrWhiteSpace(user.Tools) ? new() : user.Tools.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList(),
         Role = user.Role,
