@@ -13,7 +13,7 @@ interface CardHeaderProps {
   isMyPost?: boolean;
   onDelete?: () => void;
   imageUrl: string | null;
-  eventId: number;
+  eventId?: number;
 }
 
 export default function CardHeader({
