@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import LeftSidebar from "@/components/layout/LeftSidebar";
-import RightSidebar from "@/components/layout/RightSidebar";
+import ThreeColumnLayout from "@/components/layout/ThreeColumnLayout";
 
 interface UserProfile {
   email: string;
@@ -141,20 +140,8 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="w-full pb-[8vh] lg:pb-0 lg:flex-1 lg:min-h-0 lg:overflow-hidden">
-      {/* Desktop: 3-column layout */}
-      <div className="lg:flex lg:px-6 lg:gap-8 xl:gap-14 lg:items-stretch lg:h-full lg:overflow-hidden">
-        <LeftSidebar />
-
-        <div
-          className="lg:flex-2 max-w-190 lg:h-full lg:overflow-y-auto lg:min-h-0"
-          style={{ scrollbarWidth: "none" }}
-        >
-          {profileContent}
-        </div>
-
-        <RightSidebar />
-      </div>
-    </div>
+    <ThreeColumnLayout>
+      {profileContent}
+    </ThreeColumnLayout>
   );
 }
