@@ -114,7 +114,7 @@ export default function TopBar({ back, notifications, settings, addPost }: TopBa
       </div>
 
       {/* DESKTOP TopBar */}
-      <div className="hidden lg:flex items-center justify-between h-23 -mx-6 px-8 py-3 mb-6 border-b border-white/20">
+      <div className="hidden lg:flex items-center justify-between h-23 -mx-6 px-8 py-3 mb-8 border-b border-white/20">
         {/* Left — Branding */}
         <Link
           href="/dashboard"
@@ -131,7 +131,6 @@ export default function TopBar({ back, notifications, settings, addPost }: TopBa
 
         {/* Right — Notifications + User */}
         <div className="flex items-center gap-5">
-          {notifications && <NotificationButton />}
 
           <div className="relative" ref={dropdownRef}>
             <button
@@ -164,7 +163,7 @@ export default function TopBar({ back, notifications, settings, addPost }: TopBa
                   <span className="text-base">View profile</span>
                 </button>
                 <button
-                  onClick={() => { setDropdownOpen(false); router.push("/profile/settings"); }}
+                  onClick={() => { setDropdownOpen(false); router.push("/profile/settings/edit"); }}
                   className="flex items-center rounded-xl gap-3 w-full px-5 py-3 text-white hover:bg-white/5 transition-colors cursor-pointer"
                 >
                   <Settings size={22} className="text-white" />
