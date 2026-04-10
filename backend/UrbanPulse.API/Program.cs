@@ -58,6 +58,7 @@ namespace UrbanPulse_Backend
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddScoped<ISavedPostRepository, SavedPostRepository>();
+            builder.Services.AddScoped<IUserReportRepository, UserReportRepository>();
 
             // SignalR
             builder.Services.AddSignalR();
