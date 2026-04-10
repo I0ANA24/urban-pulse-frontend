@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { X, Bell } from "lucide-react";
+import { X, Bell, BellRing } from "lucide-react";
 import { useSignalR } from "@/context/SignalRContext";
 import { NotificationItem } from "./NotificationTypes";
 import NotificationCard from "./NotificationCard";
+import { GiRingingBell } from "react-icons/gi";
 
 const API = "http://localhost:5248";
 
@@ -16,7 +17,11 @@ interface NotificationsPanelProps {
   onUnreadChange?: (count: number) => void;
 }
 
-export default function NotificationsPanel({ open, onClose, onUnreadChange }: NotificationsPanelProps) {
+export default function NotificationsPanel({
+  open,
+  onClose,
+  onUnreadChange,
+}: NotificationsPanelProps) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(false);
@@ -74,7 +79,7 @@ export default function NotificationsPanel({ open, onClose, onUnreadChange }: No
       headers: { Authorization: `Bearer ${token}` },
     });
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
     );
     if (actionUrl) {
       onClose();
@@ -100,7 +105,9 @@ export default function NotificationsPanel({ open, onClose, onUnreadChange }: No
       {/* Backdrop */}
       <div
         className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 ${
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          open
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
       />
@@ -108,32 +115,16 @@ export default function NotificationsPanel({ open, onClose, onUnreadChange }: No
       {/* Slide-in panel */}
       <div
         className={`fixed top-0 right-0 h-full z-50 w-105 max-w-full flex flex-col
-          bg-[#111111] border-l border-white/10 shadow-2xl
+          bg-background border-l border-white/10 shadow-2xl
           transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/10 shrink-0">
-          <div className="flex items-center gap-3">
-            <Bell size={22} className="text-white" />
-            <h2 className="text-xl font-bold font-montagu text-white">Notifications</h2>
-          </div>
-          <div className="flex items-center gap-4">
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllAsRead}
-                className="text-xs text-white/40 hover:text-white transition-colors cursor-pointer"
-              >
-                Mark all read
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className="text-white/50 hover:text-white transition-colors cursor-pointer"
-            >
-              <X size={22} />
-            </button>
-          </div>
+        <div className="flex items-center justify-center px-6 pt-5 shrink-0 gap-3">
+          <BellRing size={26} className="text-white" />
+          <h2 className="text-xl font-bold font-montagu text-white">
+            Notifications
+          </h2>
         </div>
 
         {/* Content */}
@@ -141,7 +132,10 @@ export default function NotificationsPanel({ open, onClose, onUnreadChange }: No
           {loading && (
             <div className="flex flex-col gap-3 pt-2">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 rounded-2xl bg-white/5 animate-pulse" />
+                <div
+                  key={i}
+                  className="h-20 rounded-2xl bg-white/5 animate-pulse"
+                />
               ))}
             </div>
           )}
@@ -167,6 +161,6 @@ export default function NotificationsPanel({ open, onClose, onUnreadChange }: No
         </div>
       </div>
     </>,
-    document.body
+    document.body,
   );
 }
