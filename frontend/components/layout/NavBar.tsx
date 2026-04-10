@@ -16,15 +16,27 @@ export default function NavBar() {
   const isAdmin = false;
 
   return (
-    <div className="h-[8vh] w-[calc(100vw-32px)] rounded-[18px] fixed bottom-4 left-4 flex justify-center items-center overflow-hidden lg:hidden">
-      <Image
+        <div className="
+    fixed bottom-4 left-4 
+    h-[70px]                  
+    w-[calc(100vw-32px)] 
+    rounded-3xl 
+    flex justify-center items-center 
+    overflow-hidden 
+    lg:hidden 
+    bg-zinc-950/20 
+    backdrop-blur 
+    border border-white/20 
+    z-50                      
+  ">
+        <Image
         src="/navbar.svg"
         alt="navbar"
         fill
         priority
-        className="object-cover"
+        className="object-cover opacity-100"
       />
-      <nav className="container h-full w-full flex justify-between items-center px-5 relative">
+        <nav className="container h-full w-full flex justify-between items-center px-8 relative z-10">      
         <Link href={`${isAdmin ? "/admin" : "/dashboard"}`}>
           <Home
             size={28}
