@@ -101,14 +101,14 @@ function ReportForm() {
             </div>
           )}
 
-          {/* Button */}
-          <button
-            onClick={handleReport}
-            disabled={!details.trim() || loading}
-            className="w-50 h-13 rounded-2xl bg-red-emergency text-white font-bold text-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-emergency/90"
-          >
-            {loading ? "Reporting..." : "Report"}
-          </button>
+            {/* Button */}
+            <button
+              onClick={handleReport}
+              disabled={!details.trim() || loading}
+              className="w-50 h-13 rounded-2xl bg-red-emergency text-white font-bold text-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-emergency/90"
+            >
+              {loading ? "Reporting..." : "Report"}
+            </button>
         </>
       )}
     </div>
