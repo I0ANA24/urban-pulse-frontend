@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, User } from "lucide-react";
 
 const API = "http://localhost:5248";
 
@@ -23,7 +23,12 @@ interface UserProfile {
 }
 
 function getInitials(name: string) {
-  return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 }
 
 export default function UserProfilePage() {
@@ -86,7 +91,8 @@ export default function UserProfilePage() {
     );
   }
 
-  const displayName = profile.fullName ?? profile.email?.split("@")[0] ?? "User";
+  const displayName =
+    profile.fullName ?? profile.email?.split("@")[0] ?? "User";
 
   return (
     <div className="w-full flex flex-col gap-8 mt-7 pb-10">
@@ -136,35 +142,44 @@ export default function UserProfilePage() {
       </section>
 
       {/* Verified + Member since */}
-      <section className="w-full flex flex-col gap-2 px-1">
-        {profile.isVerified && (
-          <div className="flex items-center gap-2">
-            <BadgeCheck size={22} className="text-green-light fill-green-light/20" />
-            <span className="font-semibold text-sm">Verified Neighbour</span>
-          </div>
-        )}
-        {profile.createdAt && (
-          <div className="flex items-center gap-2">
-            <Image src="/member.svg" alt="member" width={20} height={20} onError={() => {}} />
-            <span className="text-sm">
-              <span className="font-bold">Member since: </span>
-              <span className="text-yellow-primary">{formatMemberSince(profile.createdAt)}</span>
-            </span>
-          </div>
-        )}
-      </section>
+      <div className="w-full flex justify-around">
+        <div className="w-contain flex-col gap-2 px-1">
+          {profile.isVerified && (
+            <div className="flex items-center gap-2">
+              <BadgeCheck
+                size={22}
+                className="text-green-light fill-green-light/20"
+              />
+              <span className="font-semibold text-sm">Verified Neighbour</span>
+            </div>
+          )}
+          {profile.createdAt && (
+            <div className="flex items-center gap-2 pt-2">
+              <User size={22} fill="white" />
+              <span className="text-sm">
+                <span className="font-bold">Member since: </span>
+                <span className="text-yellow-primary">
+                  {formatMemberSince(profile.createdAt)}
+                </span>
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="w-36 h-5">
+        </div>
+      </div>
 
       {/* Message + Report buttons */}
-      <section className="w-full flex gap-4">
+      <section className="w-full flex justify-center items-center gap-4">
         <button
           onClick={handleMessage}
-          className="flex-1 py-3 rounded-2xl border border-white/30 text-white font-bold text-sm hover:bg-white/10 transition-colors cursor-pointer"
+          className="w-50 py-3 rounded-2xl bg-blue text-[#0A0A0A] hover:bg-blue/90 font-bold text-base transition-colors cursor-pointer"
         >
           Message
         </button>
         <button
           onClick={() => router.push(`/report-user?userId=${id}`)}
-          className="flex-1 py-3 rounded-2xl bg-red-emergency/80 text-white font-bold text-sm hover:bg-red-emergency transition-colors cursor-pointer"
+          className="w-50 py-3 rounded-2xl bg-red-emergency text-white font-bold text-base hover:bg-red-emergency/90 transition-colors cursor-pointer"
         >
           Report
         </button>
@@ -172,7 +187,7 @@ export default function UserProfilePage() {
 
       {/* Bio */}
       <section className="w-full">
-        <div className="w-full mb-4 border border-third"></div>
+        <div className="w-full mb-4 border border-white/40"></div>
         <p className="w-full">
           <span className="font-bold">Bio: </span>
           {profile.bio ? (
@@ -181,7 +196,7 @@ export default function UserProfilePage() {
             <span className="text-white/30 italic">No bio yet.</span>
           )}
         </p>
-        <div className="w-full mt-4 h-px bg-white"></div>
+        <div className="w-full mt-4 h-px bg-white/40"></div>
       </section>
 
       {/* Stats */}
@@ -204,7 +219,9 @@ export default function UserProfilePage() {
 
         {/* Skills */}
         <section className="w-full min-h-25 border-2 border-yellow-primary rounded-2xl flex flex-col justify-center gap-2 items-baseline py-4 px-6 shadow-sm bg-[#1C1C1C]">
-          <h2 className="text-yellow-primary text-xl font-bold font-montagu">Skills</h2>
+          <h2 className="text-yellow-primary text-xl font-bold font-montagu">
+            Skills
+          </h2>
           {profile.skills && profile.skills.length > 0 ? (
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 w-full overflow-hidden">
               {profile.skills.map((skill, i) => (
@@ -221,7 +238,9 @@ export default function UserProfilePage() {
 
         {/* Tools & Resources */}
         <section className="w-full min-h-25 border-2 border-yellow-primary rounded-2xl flex flex-col justify-center gap-2 items-baseline py-4 px-6 shadow-sm bg-[#1C1C1C]">
-          <h2 className="text-yellow-primary text-xl font-bold font-montagu">Tools & Resources</h2>
+          <h2 className="text-yellow-primary text-xl font-bold font-montagu">
+            Tools & Resources
+          </h2>
           {profile.tools && profile.tools.length > 0 ? (
             <div className="w-full flex flex-col gap-y-2 overflow-hidden">
               {profile.tools.map((tool, i) => (
