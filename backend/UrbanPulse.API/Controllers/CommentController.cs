@@ -88,7 +88,7 @@ public class CommentController : ControllerBase
         if (ev != null && ev.CreatedByUserId != userId)
         {
             var commenter = await _userRepository.GetByIdAsync(userId);
-            var commenterName = commenter?.FullName ?? commenter?.Email?.Split('@')[0] ?? "Someone";
+            var commenterName = commenter?.FullName ?? commenter?.Email?.Split('@')[0] ?? "S";
 
             var notification = await _notificationService.SendAsync(new CreateNotificationDto
             {
@@ -98,6 +98,7 @@ public class CommentController : ControllerBase
                 Type = NotificationType.Comment,
                 ActionUrl = $"/dashboard?eventId={eventId}",
                 RelatedEventId = eventId,
+                SenderAvatarUrl = commenter?.AvatarUrl,
             });
 
             await _notificationHub.Clients.User(ev.CreatedByUserId.ToString())
