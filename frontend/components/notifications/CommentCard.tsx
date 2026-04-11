@@ -24,8 +24,12 @@ export default function CommentCard({ n, onRead }: { n: NotificationItem; onRead
         >
           {/* Avatar + name + dot + time row */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xs font-bold text-gray-800 shrink-0">
-              {initials}
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xs font-bold text-gray-800 shrink-0 overflow-hidden">
+              {n.avatarUrl ? (
+                <img src={n.avatarUrl} alt={n.title} className="w-full h-full object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <span className={`text-sm font-bold truncate ${n.isRead ? "text-white/40" : "text-white"}`}>

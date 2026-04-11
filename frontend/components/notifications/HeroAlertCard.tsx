@@ -39,8 +39,12 @@ export default function HeroAlertCard({ n, onRead }: { n: NotificationItem; onRe
 
           {/* Avatar + name row */}
           <div className="flex items-start gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xs font-bold text-gray-800 shrink-0">
-              {initials}
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xs font-bold text-gray-800 shrink-0 overflow-hidden">
+              {n.avatarUrl ? (
+                <img src={n.avatarUrl} alt={n.title} className="w-full h-full object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             <p className={`text-sm leading-snug mt-1 ${n.isRead ? "text-white/40" : "text-white"}`}>
               <span className="font-bold">{n.title}</span>
