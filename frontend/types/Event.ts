@@ -13,6 +13,8 @@ export interface Event {
   createdByAvatarUrl?: string;
   createdByUserId: number;
   isVerifiedUser?: boolean;
+  yesCount?: number;
+  noCount?: number;
   createdAt: string;
   isActive: boolean;
   isCompleted?: boolean;

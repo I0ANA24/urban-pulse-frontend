@@ -9,6 +9,9 @@ using UrbanPulse.Core.DTOs.Events;
 using UrbanPulse.Core.DTOs.Notifications;
 using UrbanPulse.Core.Entities;
 using UrbanPulse.Core.Interfaces;
+using UrbanPulse.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using UrbanPulse.Core.DTOs;
 
 namespace UrbanPulse.API.Controllers
 {
@@ -24,6 +27,7 @@ namespace UrbanPulse.API.Controllers
         private readonly INotificationService _notificationService;
         private readonly IUserRepository _userRepository;
         private readonly Cloudinary _cloudinary;
+        private readonly AppDbContext _context;
 
         public EventController(
             IEventService eventService,
@@ -31,7 +35,8 @@ namespace UrbanPulse.API.Controllers
             IHubContext<NotificationHub> notificationHub,
             IConversationRepository conversationRepository,
             INotificationService notificationService,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            AppDbContext context) 
         {
             _eventService = eventService;
             _hubContext = hubContext;
@@ -39,6 +44,7 @@ namespace UrbanPulse.API.Controllers
             _conversationRepository = conversationRepository;
             _notificationService = notificationService;
             _userRepository = userRepository;
+            _context = context;
 
             var cloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME");
             var apiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY");
@@ -218,5 +224,62 @@ namespace UrbanPulse.API.Controllers
             var events = await _eventService.GetByUserIdAsync(userId);
             return Ok(events);
         }
+
+        [HttpPost("{id}/verify")]
+        [Authorize]
+    public async Task<IActionResult> VerifyEvent(int id, [FromBody] VerifyEventDto dto)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+            return Unauthorized();
+
+        var ev = await _context.Events.FindAsync(id);
+        if (ev == null) return NotFound();
+
+        var existing = await _context.EventVerifications
+            .FirstOrDefaultAsync(v => v.EventId == id && v.UserId == userId);
+
+        if (existing != null)
+        {
+            if (existing.Vote == dto.Vote)
+                return Ok(new { yesCount = ev.YesCount, noCount = ev.NoCount, userVote = (bool?)existing.Vote });
+
+            if (existing.Vote) { ev.YesCount--; ev.NoCount++; }
+            else { ev.NoCount--; ev.YesCount++; }
+
+            existing.Vote = dto.Vote;
+        }
+        else
+        {
+            _context.EventVerifications.Add(new EventVerification
+            {
+                EventId = id,
+                UserId = userId,
+                Vote = dto.Vote
+            });
+            if (dto.Vote) ev.YesCount++;
+            else ev.NoCount++;
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(new { yesCount = ev.YesCount, noCount = ev.NoCount, userVote = (bool?)dto.Vote });
+    }
+
+    [HttpGet("{id}/verify")]
+    [Authorize]
+    public async Task<IActionResult> GetVerifyStatus(int id)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+            return Unauthorized();
+
+        var ev = await _context.Events.FindAsync(id);
+        if (ev == null) return NotFound();
+
+        var existing = await _context.EventVerifications
+            .FirstOrDefaultAsync(v => v.EventId == id && v.UserId == userId);
+
+        return Ok(new { yesCount = ev.YesCount, noCount = ev.NoCount, userVote = existing != null ? (bool?)existing.Vote : null });
+    }
     }
 }
