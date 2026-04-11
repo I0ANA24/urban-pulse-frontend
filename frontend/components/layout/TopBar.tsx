@@ -9,6 +9,7 @@ import GoBackButton from "../ui/GoBackButton";
 import ProfileRoundButton from "../ui/ProfileRoundButton";
 import { Plus } from "lucide-react";
 import { useSignalR } from "@/context/SignalRContext";
+import { useUser } from "@/context/UserContext";
 import HomeIcon from "../icons/navbar/HomeIcon";
 import NotificationsPanel from "../notifications/NotificationsPanel";
 
@@ -21,10 +22,10 @@ interface TopBarProps {
 
 export default function TopBar({ back, notifications, settings, addPost }: TopBarProps) {
   const router = useRouter();
+  const { isAdmin } = useUser();
   const [unreadCount, setUnreadCount] = useState(0);
   const [userName, setUserName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -43,7 +44,6 @@ export default function TopBar({ back, notifications, settings, addPost }: TopBa
       .then((data) => {
         setUserName(data.fullName ?? data.email ?? "");
         setAvatarUrl(data.avatarUrl ?? "");
-        setIsAdmin(data.isAdmin ?? (data.role === "Admin"));
       })
       .catch(() => {});
   }, []);
@@ -117,7 +117,7 @@ export default function TopBar({ back, notifications, settings, addPost }: TopBa
       <div className="hidden lg:flex items-center justify-between h-23 -mx-6 px-8 py-3 mb-8 border-b border-white/20">
         {/* Left — Branding */}
         <Link
-          href="/dashboard"
+          href={isAdmin ? "/admin" : "/dashboard"}
           className="flex items-center gap-2"
           onClick={() => {
             const feed = document.getElementById("feed-scroll");
@@ -169,7 +169,7 @@ export default function TopBar({ back, notifications, settings, addPost }: TopBa
             {dropdownOpen && (
               <div className="absolute right-0 top-full px-2 mt-3 w-65 bg-[#0F0F0F] border border-secondary rounded-2xl py-2 shadow-xl z-50">
                 <button
-                  onClick={() => { setDropdownOpen(false); router.push("/profile"); }}
+                  onClick={() => { setDropdownOpen(false); router.push(isAdmin ? "/admin/profile" : "/profile"); }}
                   className="flex items-center rounded-xl gap-3 w-full px-5 py-3 text-white hover:bg-white/5 transition-colors cursor-pointer"
                 >
                   <UserCircle size={22} className="text-white" />
