@@ -9,6 +9,7 @@ import NumberOfReports from "@/components/admin/NumberOfReports";
 import CheckButton from "@/components/admin/CheckButton";
 import ResolveTaskModal from "@/components/ui/ResolveTaskModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+import ThreeColumnLayoutAdmin from "@/components/layout/ThreeColumnLayoutAdmin";
 
 // ── Mock data — înlocuiește cu fetch-uri din API ──
 interface Report {
@@ -89,7 +90,7 @@ export default function FlaggedUserDetailPage() {
   const emptyStars = 5 - fullStars;
 
   return (
-    <>
+    <ThreeColumnLayoutAdmin>
       <div className="w-full flex flex-col gap-6 animate-fade-up pb-20">
         {/* Header */}
         <div className="flex items-center justify-between relative">
@@ -214,6 +215,6 @@ export default function FlaggedUserDetailPage() {
           />
         </div>
       </ConfirmModal>
-    </>
+    </ThreeColumnLayoutAdmin>
   );
 }
