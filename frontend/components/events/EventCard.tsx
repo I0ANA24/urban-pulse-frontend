@@ -44,11 +44,19 @@ export default function EventCard({ event, isMyPost, onDelete, flagCount, onView
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [likes, setLikes] = useState(0);
+  const [yesCount, setYesCount] = useState(event.yesCount ?? 0);
+  const [noCount, setNoCount] = useState(event.noCount ?? 0);
+  const [userVote, setUserVote] = useState<boolean | null>(null);
   const [commentCount, setCommentCount] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isCompleted, setIsCompleted] = useState(event.isCompleted ?? false);
   const { connection } = useSignalR();
+
+  const typeMap: Record<number, EventType> = { 0: "General", 1: "Emergency", 2: "Skill", 3: "Lend" };
+  const mappedType = typeof event.type === "number" ? typeMap[event.type] : (event.type as EventType);
+  const isOwner = isMyPost || currentUserId === event.createdByUserId;
+  const displayName = event.createdByFullName ?? event.createdByEmail?.split("@")[0] ?? "Unknown";
 
   useEffect(() => {
     if (user) setCurrentUserId(user.id);
@@ -69,7 +77,17 @@ export default function EventCard({ event, isMyPost, onDelete, flagCount, onView
     fetch(`${API}/api/event/${event.id}/save`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => setSaved(d.saved));
-  }, [event.id]);
+
+    if (mappedType === "Emergency") {
+      fetch(`${API}/api/event/${event.id}/verify`, { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => r.json())
+        .then((d) => {
+          setYesCount(d.yesCount);
+          setNoCount(d.noCount);
+          setUserVote(d.userVote ?? null);
+        });
+    }
+  }, [event.id, mappedType]);
 
   useEffect(() => {
     if (!connection) return;
@@ -118,10 +136,18 @@ export default function EventCard({ event, isMyPost, onDelete, flagCount, onView
     setIsCompleted(true);
   };
 
-  const typeMap: Record<number, EventType> = { 0: "General", 1: "Emergency", 2: "Skill", 3: "Lend" };
-  const mappedType = typeof event.type === "number" ? typeMap[event.type] : (event.type as EventType);
-  const isOwner = isMyPost || currentUserId === event.createdByUserId;
-  const displayName = event.createdByFullName ?? event.createdByEmail?.split("@")[0] ?? "Unknown";
+  const handleVote = async (vote: boolean) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API}/api/event/${event.id}/verify`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ vote }),
+    });
+    const d = await res.json();
+    setYesCount(d.yesCount);
+    setNoCount(d.noCount);
+    setUserVote(d.userVote ?? null);
+  };
 
   return (
     <div id={`event-${event.id}`} className="w-full relative mb-4">
@@ -139,8 +165,20 @@ export default function EventCard({ event, isMyPost, onDelete, flagCount, onView
       />
       <CardMedia imageUrl={event.imageUrl} />
       <div className={`bg-secondary -mt-4 z-10 rounded-4xl ${event.imageUrl ? "rounded-t-4xl" : "rounded-t-none"} p-5 lg:px-10`}>
-        <CardContent description={event.description} isVerified={mappedType === "Emergency"} />
-        <CardActions type={mappedType} isMyPost={isOwner} onMessage={handleMessage} isCompleted={isCompleted} onComplete={handleComplete} />
+        <CardContent
+          description={event.description}
+          isVerified={mappedType === "Emergency"}
+          yesCount={yesCount}
+        />
+        <CardActions
+          type={mappedType}
+          isMyPost={isOwner}
+          onMessage={handleMessage}
+          isCompleted={isCompleted}
+          onComplete={handleComplete}
+          onVote={handleVote}
+          userVote={userVote}
+        />
         <CardFooter
           likes={likes} liked={liked} onLike={handleLike}
           saved={saved} onSave={handleSave}

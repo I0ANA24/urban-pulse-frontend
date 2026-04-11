@@ -6,6 +6,8 @@ interface CardActionsProps {
   onMessage?: () => void;
   isCompleted?: boolean;
   onComplete?: () => void;
+  onVote?: (vote: boolean) => void;
+  userVote?: boolean | null;
 }
 
 export default function CardActions({
@@ -14,8 +16,11 @@ export default function CardActions({
   onMessage,
   isCompleted,
   onComplete,
+  onVote,
+  userVote,
 }: CardActionsProps) {
   if (type === "Emergency") {
+    if (isMyPost) return null;
     return (
       <div className="flex flex-col gap-3 pb-3 max-w-100 mx-auto mt-4">
         <div className="flex items-center gap-3 w-full">
@@ -26,12 +31,36 @@ export default function CardActions({
           <div className="h-px bg-white/10 flex-1" />
         </div>
         <div className="flex gap-3 w-full">
-          <button className="flex-1 bg-green-light text-black rounded-full py-2 font transition-transform active:scale-95 cursor-pointer">
-            <span className="font-bold">Yes</span>, it is.
-          </button>
-          <button className="flex-1 bg-red-emergency text-white rounded-full py-2 font transition-transform active:scale-95 cursor-pointer">
-            <span className="font-bold">No</span>, it isn't.
-          </button>
+          {userVote === null || userVote === undefined ? (
+            <>
+              <button
+                onClick={() => onVote?.(true)}
+                className="flex-1 bg-green-light text-black rounded-full py-2 font transition-transform active:scale-95 cursor-pointer"
+              >
+                <span className="font-bold">Yes</span>, it is.
+              </button>
+              <button
+                onClick={() => onVote?.(false)}
+                className="flex-1 bg-red-emergency text-white rounded-full py-2 font transition-transform active:scale-95 cursor-pointer"
+              >
+                <span className="font-bold">No</span>, it isn't.
+              </button>
+            </>
+          ) : userVote === true ? (
+            <button
+              onClick={() => onVote?.(true)}
+              className="flex-1 bg-green-light text-black rounded-full py-2 font transition-transform active:scale-95 cursor-pointer"
+            >
+              ✓ <span className="font-bold">Yes</span>, it is.
+            </button>
+          ) : (
+            <button
+              onClick={() => onVote?.(false)}
+              className="flex-1 bg-red-emergency text-white rounded-full py-2 font transition-transform active:scale-95 cursor-pointer"
+            >
+              ✓ <span className="font-bold">No</span>, it isn't.
+            </button>
+          )}
         </div>
       </div>
     );
