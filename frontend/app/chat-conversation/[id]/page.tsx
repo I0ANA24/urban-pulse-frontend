@@ -335,12 +335,22 @@ export default function ChatPage() {
                 className="fixed z-50 bg-secondary border border-white/40 p-2 rounded-2xl overflow-hidden w-52 shadow-xl"
                 style={{ top: menuPos.top, left: menuPos.left, transform: "translateY(calc(-100% - 8px))" }}
               >
-                <button className="w-full flex items-center gap-0 px-4 py-3 hover:bg-green-light hover:text-black text-white text-base rounded-2xl cursor-pointer">
-                  <ThumbsUp size={14} strokeWidth={2.5} />
-                  <ThumbsDown size={14} strokeWidth={2.5} />
-                  <p className="pl-4">Rate</p>
-                </button>
-                <div className="w-[95%] h-px bg-white/20 mx-auto my-2" />
+                {otherUserId !== currentUserId && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setShowPlusMenu(false);
+                        if (otherUserId) router.push(`/rate?userId=${otherUserId}`);
+                      }}
+                      className="w-full flex items-center gap-0 px-4 py-3 hover:bg-green-light hover:text-black text-white text-base rounded-2xl cursor-pointer"
+                    >
+                      <ThumbsUp size={14} strokeWidth={2.5} />
+                      <ThumbsDown size={14} strokeWidth={2.5} />
+                      <p className="pl-4">Rate</p>
+                    </button>
+                    <div className="w-[95%] h-px bg-white/20 mx-auto my-2" />
+                  </>
+                )}
                 <button onClick={handleSendInfo} className="group w-full flex items-center gap-3 px-4 py-3 text-white text-base hover:bg-green-light hover:text-black transition-colors rounded-2xl cursor-pointer">
                   <svg width="22" height="19" viewBox="0 0 37 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" className="filter-[brightness(0)_invert(1)] group-hover:filter-[brightness(0)]">
                     <rect width="37" height="31.7346" fill="url(#sendinfo-pattern)"/>
