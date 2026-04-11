@@ -98,6 +98,7 @@ public class CommentController : ControllerBase
                 Type = NotificationType.Comment,
                 ActionUrl = $"/dashboard?eventId={eventId}",
                 RelatedEventId = eventId,
+                SenderAvatarUrl = commenter?.AvatarUrl,
             });
 
             await _notificationHub.Clients.User(ev.CreatedByUserId.ToString())
