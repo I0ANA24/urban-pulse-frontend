@@ -19,19 +19,25 @@ public class AdminController : ControllerBase
     private readonly IUserRepository _userRepository;
     private readonly AppDbContext _context;
     private readonly IHubContext<NotificationHub> _notificationHub;
+    private readonly IEventService _eventService;
+    private readonly IHubContext<EventHub> _eventHub;
 
     public AdminController(
-    IAdminStatsRepository adminStatsRepository,
-    IDuplicateSuspectRepository duplicateSuspectRepository,
-    IUserRepository userRepository,
-    AppDbContext context,
-    IHubContext<NotificationHub> notificationHub)
+        IAdminStatsRepository adminStatsRepository,
+        IDuplicateSuspectRepository duplicateSuspectRepository,
+        IUserRepository userRepository,
+        AppDbContext context,
+        IHubContext<NotificationHub> notificationHub,
+        IHubContext<EventHub> eventHub,
+        IEventService eventService)
     {
         _adminStatsRepository = adminStatsRepository;
         _duplicateSuspectRepository = duplicateSuspectRepository;
         _userRepository = userRepository;
         _context = context;
         _notificationHub = notificationHub;
+        _eventHub = eventHub;
+        _eventService = eventService;
     }
 
     [HttpGet("stats")]
@@ -157,7 +163,8 @@ public class AdminController : ControllerBase
         await _context.SaveChangesAsync();
 
         await _notificationHub.Clients.User(userId.ToString())
-        .SendAsync("UserBanned");
+            .SendAsync("UserBanned");
+
         return Ok();
     }
 
@@ -187,6 +194,107 @@ public class AdminController : ControllerBase
         user.IsBanned = false;
         await _context.SaveChangesAsync();
 
+        return Ok();
+    }
+
+    [HttpGet("flagged-content")]
+    public async Task<IActionResult> GetFlaggedContent()
+    {
+        var flaggedEvents = await _context.Reports
+            .GroupBy(r => r.EventId)
+            .Select(g => new
+            {
+                EventId = g.Key,
+                FlagCount = g.Count()
+            })
+            .Join(_context.Events.Include(e => e.CreatedByUser),
+                r => r.EventId,
+                e => e.Id,
+                (r, e) => new
+                {
+                    e.Id,
+                    e.Description,
+                    e.Type,
+                    e.Latitude,
+                    e.Longitude,
+                    e.Tags,
+                    e.ImageUrl,
+                    e.CreatedAt,
+                    e.IsActive,
+                    CreatedByUserId = e.CreatedByUserId,
+                    CreatedByEmail = e.CreatedByUser.Email,
+                    CreatedByFullName = e.CreatedByUser.FullName,
+                    CreatedByAvatarUrl = e.CreatedByUser.AvatarUrl,
+                    FlagCount = r.FlagCount,
+                })
+            .OrderByDescending(e => e.FlagCount)
+            .ToListAsync();
+
+        return Ok(flaggedEvents);
+    }
+
+    [HttpGet("flagged-content/{eventId}")]
+    public async Task<IActionResult> GetFlaggedContentDetail(int eventId)
+    {
+        var ev = await _context.Events
+            .Include(e => e.CreatedByUser)
+            .FirstOrDefaultAsync(e => e.Id == eventId);
+
+        if (ev == null) return NotFound();
+
+        var reports = await _context.Reports
+            .Where(r => r.EventId == eventId)
+            .Include(r => r.ReportedByUser)
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new
+            {
+                Id = r.Id,
+                ReporterName = r.ReportedByUser.FullName ?? r.ReportedByUser.Email,
+                ReporterAvatarUrl = r.ReportedByUser.AvatarUrl,
+                Details = r.Details,
+                CreatedAt = r.CreatedAt,
+            })
+            .ToListAsync();
+
+        return Ok(new
+        {
+            ev.Id,
+            ev.Description,
+            ev.Type,
+            ev.Tags,
+            ev.ImageUrl,
+            ev.CreatedAt,
+            CreatedByUserId = ev.CreatedByUserId,
+            CreatedByFullName = ev.CreatedByUser?.FullName ?? ev.CreatedByUser?.Email,
+            CreatedByAvatarUrl = ev.CreatedByUser?.AvatarUrl,
+            FlagCount = reports.Count,
+            Reports = reports,
+        });
+    }
+
+    [HttpDelete("flagged-content/{eventId}")]
+    public async Task<IActionResult> DeleteFlaggedContent(int eventId)
+    {
+        var reports = await _context.Reports
+            .Where(r => r.EventId == eventId)
+            .ToListAsync();
+        _context.Reports.RemoveRange(reports);
+        await _context.SaveChangesAsync();
+
+        await _eventService.DeactivateAsync(eventId);
+        await _eventHub.Clients.All.SendAsync("EventDeactivated", eventId);
+
+        return Ok();
+    }
+
+    [HttpDelete("flagged-content/{eventId}/dismiss")]
+    public async Task<IActionResult> DismissFlaggedContent(int eventId)
+    {
+        var reports = await _context.Reports
+            .Where(r => r.EventId == eventId)
+            .ToListAsync();
+        _context.Reports.RemoveRange(reports);
+        await _context.SaveChangesAsync();
         return Ok();
     }
 }
