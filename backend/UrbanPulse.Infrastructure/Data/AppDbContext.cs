@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<DuplicateSuspect> DuplicateSuspects { get; set; }
     public DbSet<GlobalMessage> GlobalMessages { get; set; }
     public DbSet<EventVerification> EventVerifications { get; set; }
+    public DbSet<SevereMessage> SevereMessages { get; set; }
     
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

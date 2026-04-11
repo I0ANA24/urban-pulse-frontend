@@ -63,6 +63,7 @@ namespace UrbanPulse_Backend
             builder.Services.AddScoped<IDuplicateSuspectRepository, DuplicateSuspectRepository>();
             builder.Services.AddScoped<IDuplicateDetectionService, DuplicateDetectionService>();
 
+
             // SignalR
             builder.Services.AddSignalR();
 
@@ -146,6 +147,7 @@ namespace UrbanPulse_Backend
             app.MapHub<EventHub>("/hubs/events");
             app.MapHub<NotificationHub>("/hubs/notifications");
             app.MapHub<GlobalChatHub>("/hubs/global-chat");
+            app.MapHub<SevereChatHub>("/hubs/severe-chat");
 
             app.Run();
         }

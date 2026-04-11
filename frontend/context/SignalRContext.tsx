@@ -32,7 +32,6 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
   useEffect(() => {
     if (isPublic) return;
 
-    // Events hub
     const eventsConn = new signalR.HubConnectionBuilder()
       .withUrl("http://localhost:5248/hubs/events")
       .withAutomaticReconnect()
@@ -43,7 +42,6 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
 
     const token = localStorage.getItem("token");
     if (token) {
-      // Notifications hub
       const notifConn = new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5248/hubs/notifications", {
           accessTokenFactory: () => localStorage.getItem("token") ?? "",
@@ -54,7 +52,6 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
       setNotificationConnection(notifConn);
       notifConn.start().catch((err) => console.error("Notifications SignalR error:", err));
 
-      // Global chat hub
       const globalConn = new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5248/hubs/global-chat", {
           accessTokenFactory: () => localStorage.getItem("token") ?? "",
@@ -65,7 +62,6 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
       setGlobalChatConnection(globalConn);
       globalConn.start().catch((err) => console.error("Global chat SignalR error:", err));
 
-      // Severe chat hub
       const severeConn = new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5248/hubs/severe-chat", {
           accessTokenFactory: () => localStorage.getItem("token") ?? "",
