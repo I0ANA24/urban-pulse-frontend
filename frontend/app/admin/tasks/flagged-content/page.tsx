@@ -7,6 +7,7 @@ import EventFilters from "@/components/dashboard/EventFilters";
 import { Event, EventType } from "@/types/Event";
 import { EVENT_TAG_STYLES } from "@/lib/constants";
 import GoBackButton from "@/components/ui/GoBackButton";
+import ThreeColumnLayoutAdmin from "@/components/layout/ThreeColumnLayoutAdmin";
 
 const mockFlaggedEvents: (Event & { flagCount: number })[] = [
   {
@@ -83,6 +84,7 @@ export default function FlaggedContentPage() {
   };
 
   return (
+    <ThreeColumnLayoutAdmin>
     <div className="w-full flex flex-col gap-4 animate-fade-up pb-20">
       {/* Header */}
       <div className="flex items-center relative mb-4">
@@ -119,5 +121,6 @@ export default function FlaggedContentPage() {
         ))}
       </div>
     </div>
+    </ThreeColumnLayoutAdmin>
   );
 }

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronRight } from "lucide-react";
+import ThreeColumnLayoutAdmin from "@/components/layout/ThreeColumnLayoutAdmin";
 
 const API = "http://localhost:5248";
 
@@ -62,6 +63,7 @@ export default function AdminTasksPage() {
   ];
 
   return (
+    <ThreeColumnLayoutAdmin>
     <div className="w-full flex flex-col gap-6 animate-fade-up">
       {/* Header */}
       <div className="flex items-center relative">
@@ -106,5 +108,6 @@ export default function AdminTasksPage() {
         ))}
       </div>
     </div>
+    </ThreeColumnLayoutAdmin>
   );
 }

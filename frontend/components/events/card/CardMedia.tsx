@@ -10,7 +10,7 @@ export default function CardMedia({ imageUrl }: CardMediaProps) {
   return (
     <div className="relative w-full -mt-3 -z-10">
       <Image
-        src={`http://localhost:5248${imageUrl}`}
+        src={imageUrl.startsWith("http") ? imageUrl : `http://localhost:5248${imageUrl}`}
         alt="Event Image"
         width={350}
         height={220}

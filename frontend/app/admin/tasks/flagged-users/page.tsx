@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import GoBackButton from "@/components/ui/GoBackButton";
+import ThreeColumnLayoutAdmin from "@/components/layout/ThreeColumnLayoutAdmin";
 
 const API = "http://localhost:5248";
 
@@ -39,6 +40,7 @@ export default function FlaggedUsersPage() {
   }, []);
 
   return (
+    <ThreeColumnLayoutAdmin>
     <div className="w-full flex flex-col gap-6 animate-fade-up pb-20">
       {/* Header */}
       <div className="flex items-center relative">
@@ -108,5 +110,6 @@ export default function FlaggedUsersPage() {
         </div>
       )}
     </div>
+    </ThreeColumnLayoutAdmin>
   );
 }

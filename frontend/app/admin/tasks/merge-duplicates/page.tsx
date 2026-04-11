@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import GoBackButton from "@/components/ui/GoBackButton";
 import { HiUsers } from "react-icons/hi";
+import ThreeColumnLayoutAdmin from "@/components/layout/ThreeColumnLayoutAdmin";
 
 const API = "http://localhost:5248";
 
@@ -58,6 +59,7 @@ export default function MergeDuplicatesPage() {
   };
 
   return (
+    <ThreeColumnLayoutAdmin>
     <div className="w-full flex flex-col gap-4 animate-fade-up pb-20">
       {/* Header */}
       <div className="flex items-center relative mb-4">
@@ -170,5 +172,6 @@ export default function MergeDuplicatesPage() {
         ))}
       </div>
     </div>
+    </ThreeColumnLayoutAdmin>
   );
 }

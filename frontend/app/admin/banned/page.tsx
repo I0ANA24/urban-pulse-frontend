@@ -5,6 +5,7 @@ import GoBackButton from "@/components/ui/GoBackButton";
 import BannedUserCard from "@/components/admin/banned/BannedUserCard";
 import { BannedUser } from "@/types/BannedUser";
 import SearchBar from '../../../components/search/SearchBar';
+import ThreeColumnLayoutAdmin from "@/components/layout/ThreeColumnLayoutAdmin";
 
 const mockBannedUsers: BannedUser[] = [
   { id: "1", name: "Anna Wintour", avatar: "/profile.png", bannedOn: "02/03/2026", reason: "Spamming" },
@@ -26,6 +27,7 @@ export default function BannedUsersPage() {
   };
 
   return (
+    <ThreeColumnLayoutAdmin>
     <div className="w-full flex flex-col gap-5 animate-fade-up">
       {/* Header */}
       <div className="flex items-center relative">
@@ -55,5 +57,6 @@ export default function BannedUsersPage() {
         )}
       </div>
     </div>
+    </ThreeColumnLayoutAdmin>
   );
 }
