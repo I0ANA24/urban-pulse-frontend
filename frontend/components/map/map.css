@@ -144,6 +144,7 @@
 
 /* Radius control */
 .map-radius-control {
+  cursor: pointer;
   position: absolute;
   bottom: calc(8vh + 48px);
   left: 60%;
