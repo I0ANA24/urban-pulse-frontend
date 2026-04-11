@@ -142,6 +142,44 @@
 .tool-dot { background: #3B82F6; }
 .emerg-dot { background: #EF4444; }
 
+/* Radius control */
+.map-radius-control {
+  position: absolute;
+  bottom: calc(8vh + 48px);
+  left: 60%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(20, 20, 20, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 10px 20px;
+  z-index: 500;
+}
+
+.map-radius-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  width: 70px;
+  text-align: center;
+}
+.map-radius-input::-webkit-inner-spin-button,
+.map-radius-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+.map-radius-label {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
 .map-loading {
   position: absolute;
   bottom: calc(8vh + 48px);
