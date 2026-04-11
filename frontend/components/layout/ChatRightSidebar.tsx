@@ -88,6 +88,7 @@ export default function ChatRightSidebar() {
             <span className="w-2 h-2 rounded-full bg-green-light" />
           </div>
         </div>
+        <p className="text-white/40 text-xs pl-12">Chat with all your neighbours</p>
       </button>
 
       {conversations.length > 0 && (
@@ -135,7 +136,9 @@ export default function ChatRightSidebar() {
                   </div>
                 </div>
                 <p className="text-white/40 text-xs truncate pl-10">
-                  {conv.lastMessage ?? "No messages yet"}
+                  {conv.lastMessage?.startsWith("__INFO_CARD__")
+                    ? "📋 Personal Info"
+                    : conv.lastMessage ?? "No messages yet"}
                 </p>
               </button>
             ))}

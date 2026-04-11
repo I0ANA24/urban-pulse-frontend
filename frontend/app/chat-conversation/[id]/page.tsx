@@ -109,6 +109,29 @@ export default function ChatPage() {
     setText("");
   };
 
+  const handleSendInfo = async () => {
+    setShowPlusMenu(false);
+    const token = localStorage.getItem("token");
+    const profile = await fetch("http://localhost:5248/api/user/profile", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => res.json());
+
+    const payload = JSON.stringify({
+      name: profile.fullName ?? profile.email?.split("@")[0] ?? "—",
+      phone: profile.phoneNumber ?? "—",
+      address: profile.address ?? "—",
+    });
+
+    await fetch(`http://localhost:5248/api/chat/conversations/${id}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: `__INFO_CARD__${payload}` }),
+    });
+  };
+
   const handleHelped = (msgId: number, helped: boolean) => {
     if (helped) {
       setHelpedMessages((prev) => new Set([...prev, msgId]));
@@ -187,6 +210,28 @@ export default function ChatPage() {
               const isMe = msg.senderId === currentUserId;
               const hasHelped = helpedMessages.has(msg.id);
               const hasRatedThis = ratedMessages.has(msg.id) || hasRated;
+
+              if (msg.text?.startsWith("__INFO_CARD__")) {
+                const info = JSON.parse(msg.text.replace("__INFO_CARD__", ""));
+                return (
+                  <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+                    <div className="w-60 bg-secondary border-4 border-blue rounded-2xl px-5 py-4 flex flex-col gap-3">
+                      <p className="text-white font-bold text-base text-center">{info.name}</p>
+                      <div className="w-full h-px bg-white/20" />
+                      <div className="flex flex-col gap-2 text-sm">
+                        <p>
+                          <span className="font-bold text-white">Phone: </span>
+                          <span className="text-yellow-primary">{info.phone}</span>
+                        </p>
+                        <p>
+                          <span className="font-bold text-white">Address: </span>
+                          <span className="text-yellow-primary">{info.address}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
 
               if (msg.messageType === "rating_check" && !isMe) return null;
 
@@ -289,7 +334,7 @@ export default function ChatPage() {
                   </span>
                   Videos
                 </button>
-                <button className="w-full flex items-center gap-3 px-4 py-3 text-white text-base hover:bg-green-light transition-colors border-t border-white/10 rounded-2xl cursor-pointer">
+                <button onClick={handleSendInfo} className="w-full flex items-center gap-3 px-4 py-3 text-white text-base hover:bg-green-light transition-colors border-t border-white/10 rounded-2xl cursor-pointer">
                   <span className="w-8 h-8 rounded-lg bg-[#d97706] flex items-center justify-center shrink-0">
                     <IdCard size={16} className="text-white" strokeWidth={2} />
                   </span>

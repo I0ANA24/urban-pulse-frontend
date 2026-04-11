@@ -138,7 +138,9 @@ export default function ChatsPage() {
                   </div>
                 </div>
                 <p className="text-white/40 text-sm truncate">
-                  {conv.lastMessage ?? "No messages yet"}
+                  {conv.lastMessage?.startsWith("__INFO_CARD__")
+                    ? "📋 Personal Info"
+                    : conv.lastMessage ?? "No messages yet"}
                 </p>
               </button>
             ))}
