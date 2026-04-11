@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { MapContainer, TileLayer, ZoomControl, useMap } from "react-leaflet";
 import L from "leaflet";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import "./map.css";
+import { useRadius } from "@/context/RadiusContext";
 
 const DEFAULT_CENTER: [number, number] = [47.1585, 27.6014];
 const DEFAULT_ZOOM = 12;
@@ -55,6 +57,58 @@ interface EventMarker {
   type: "skill" | "lend" | "emergency";
 }
 
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function LocationModal({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
+
+  return createPortal(
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6"
+      style={{ zIndex: 9999 }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-[#1C1C1C] rounded-3xl p-6 w-full max-w-sm border border-white/10 flex flex-col gap-5 animate-fade-up"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex flex-col gap-2">
+          <h2 className="text-white font-bold text-lg font-montagu">
+            Location Required
+          </h2>
+          <p className="text-white/50 text-sm leading-relaxed">
+            To filter by radius, you need to set your location in your profile first.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={() => router.push("/profile/settings/personal")}
+            className="w-full bg-green-light text-black font-bold py-3 rounded-xl hover:bg-green-light/85 transition-colors"
+          >
+            Go to Settings
+          </button>
+          <button
+            onClick={onClose}
+            className="w-full border border-white/20 text-white/60 font-medium py-3 rounded-xl hover:bg-white/5 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
 
 function ProfileCard({ user, onClose }: { user: UserProfile; onClose: () => void }) {
   const router = useRouter();
@@ -287,43 +341,43 @@ function MarkersLayer({
     });
 
     eventMarkers.forEach(({ event, type }) => {
-  const color = type === "emergency" ? "#EF4444" : type === "skill" ? "#FFD700" : "#3B82F6";
-  const seed = event.id * 6271 + 12347;
-  const rLat = ((seed % 233280) / 233280 - 0.5) * 0.001;
-  const rLng = (((seed * 4421) % 233280) / 233280 - 0.5) * 0.0015;
+      const color = type === "emergency" ? "#EF4444" : type === "skill" ? "#FFD700" : "#3B82F6";
+      const seed = event.id * 6271 + 12347;
+      const rLat = ((seed % 233280) / 233280 - 0.5) * 0.001;
+      const rLng = (((seed * 4421) % 233280) / 233280 - 0.5) * 0.0015;
 
-  if (type === "emergency") {
-    const icon = L.divIcon({
-      className: "",
-      html: `<div style="
-      width: 26px; height: 26px;
-      background: #EF4444;
-      border: 2px solid #EF4444;
-      border-radius: 50%;
-      box-shadow: 0 0 12px rgba(239,68,68,0.8), 0 0 24px rgba(239,68,68,0.4);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: bold; color: white;
-      line-height: 1;
-    ">🚨</div>`,
-    iconSize: [26, 26],
-    iconAnchor: [13, 13],
+      if (type === "emergency") {
+        const icon = L.divIcon({
+          className: "",
+          html: `<div style="
+            width: 26px; height: 26px;
+            background: #EF4444;
+            border: 2px solid #EF4444;
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(239,68,68,0.8), 0 0 24px rgba(239,68,68,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: bold; color: white;
+            line-height: 1;
+          ">🚨</div>`,
+          iconSize: [26, 26],
+          iconAnchor: [13, 13],
+        });
+        const marker = L.marker([event.latitude, event.longitude], { icon }).addTo(map);
+        marker.on("click", () => onEventClick(event));
+        refs.current.push(marker);
+      } else {
+        const circle = L.circle([event.latitude + rLat, event.longitude + rLng], {
+          radius: 300,
+          color,
+          fillColor: color,
+          fillOpacity: 0.25,
+          opacity: 0.6,
+          weight: 2,
+        }).addTo(map);
+        circle.on("click", () => onEventClick(event));
+        refs.current.push(circle);
+      }
     });
-    const marker = L.marker([event.latitude, event.longitude], { icon }).addTo(map);
-    marker.on("click", () => onEventClick(event));
-    refs.current.push(marker);
-  } else {
-    const circle = L.circle([event.latitude + rLat, event.longitude + rLng], {
-      radius: 300,
-      color,
-      fillColor: color,
-      fillOpacity: 0.25,
-      opacity: 0.6,
-      weight: 2,
-    }).addTo(map);
-    circle.on("click", () => onEventClick(event));
-    refs.current.push(circle);
-  }
-});
 
     return () => {
       refs.current.forEach((m) => map.removeLayer(m));
@@ -337,6 +391,8 @@ export default function MapView() {
   const [mounted, setMounted] = useState(false);
   const [filter, setFilter] = useState<FilterMode>("disponibili");
   const [searchQuery, setSearchQuery] = useState("");
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [showLocationModal, setShowLocationModal] = useState(false);
   const [userMarkers, setUserMarkers] = useState<UserMarker[]>([]);
   const [eventMarkersDisponibili, setEventMarkersDisponibili] = useState<EventMarker[]>([]);
   const [eventMarkersPotAjuta, setEventMarkersPotAjuta] = useState<EventMarker[]>([]);
@@ -345,7 +401,29 @@ export default function MapView() {
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
 
+  const radiusRef = useRef<HTMLDivElement>(null);
+  const { radiusKm, setRadiusKm } = useRadius();
+
   useEffect(() => { setMounted(true); }, []);
+
+  useEffect(() => {
+    if (!mounted || !radiusRef.current) return;
+    L.DomEvent.disableClickPropagation(radiusRef.current);
+  }, [mounted]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const token = localStorage.getItem("token");
+    fetch(`${API}/api/user/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.latitude && d.longitude) {
+          setUserLocation({ lat: d.latitude, lng: d.longitude });
+        }
+      });
+  }, [mounted]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -414,15 +492,25 @@ export default function MapView() {
   const handleEventClick = useCallback((e: EventItem) => { setSelectedEvent(e); setSelectedUser(null); }, []);
 
   const q = searchQuery.toLowerCase().trim();
-  const filteredUserMarkers = q
-    ? userMarkers.filter(({ user }) =>
-        user.skills.some((s) => s.toLowerCase().includes(q)) ||
-        user.tools.some((t) => t.toLowerCase().includes(q)) ||
-        user.fullName?.toLowerCase().includes(q)
-      )
-    : userMarkers;
+
+  const filteredUserMarkers = userMarkers.filter(({ user, lat, lng }) => {
+    if (userLocation) {
+      const dist = haversineKm(userLocation.lat, userLocation.lng, lat, lng);
+      if (dist > radiusKm) return false;
+    }
+    if (!q) return true;
+    return (
+      user.skills.some((s) => s.toLowerCase().includes(q)) ||
+      user.tools.some((t) => t.toLowerCase().includes(q)) ||
+      user.fullName?.toLowerCase().includes(q)
+    );
+  });
 
   const filteredEventMarkers = (filter === "disponibili" ? eventMarkersDisponibili : eventMarkersPotAjuta).filter(({ event }) => {
+    if (userLocation) {
+      const dist = haversineKm(userLocation.lat, userLocation.lng, event.latitude, event.longitude);
+      if (dist > radiusKm) return false;
+    }
     if (!q) return true;
     const tags = Array.isArray(event.tags) ? event.tags : [];
     return (
@@ -497,6 +585,28 @@ export default function MapView() {
           <div className="legend-item"><span className="legend-dot emerg-dot" />Emergency</div>
         </div>
 
+        <div
+          ref={radiusRef}
+          className="map-radius-control"
+          onClick={() => { if (!userLocation) setShowLocationModal(true); }}
+          style={{ cursor: !userLocation ? "pointer" : "default" }}
+        >
+          <input
+            type="number"
+            min={1}
+            max={300}
+            value={radiusKm}
+            onChange={(e) => {
+              if (!userLocation) return;
+              setRadiusKm(Math.max(1, Math.min(300, Number(e.target.value))));
+            }}
+            readOnly={!userLocation}
+            className="map-radius-input"
+            style={{ cursor: !userLocation ? "pointer" : "text" }}
+          />
+          <span className="map-radius-label">KM</span>
+        </div>
+
         {isLoading && (
           <div className="map-loading">
             <div className="map-loading-dot" />
@@ -505,6 +615,9 @@ export default function MapView() {
         )}
       </div>
 
+      {showLocationModal && (
+        <LocationModal onClose={() => setShowLocationModal(false)} />
+      )}
       {selectedUser && <ProfileCard user={selectedUser} onClose={() => setSelectedUser(null)} />}
       {selectedEvent && <EventCard event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
     </>

@@ -3,6 +3,7 @@ import { Montagu_Slab, Inter } from "next/font/google";
 import { SignalRProvider } from "@/context/SignalRContext";
 import { UserProvider } from "@/context/UserContext";
 import { EventProvider } from "@/context/EventContext";
+import { RadiusProvider } from "@/context/RadiusContext";
 import "./globals.css";
 
 const montagu = Montagu_Slab({
@@ -38,7 +39,9 @@ export default function RootLayout({
         <SignalRProvider>
           <UserProvider>
             <EventProvider>
-              {children}
+              <RadiusProvider>
+                {children}
+              </RadiusProvider>
             </EventProvider>
           </UserProvider>
         </SignalRProvider>
