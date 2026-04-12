@@ -20,6 +20,7 @@ export default function CardActions({
   userVote,
 }: CardActionsProps) {
   if (type === "Emergency") {
+    if (isMyPost === undefined) return null;
     if (isMyPost) return null;
     return (
       <div className="flex flex-col gap-3 pb-3 max-w-100 mx-auto mt-4">
