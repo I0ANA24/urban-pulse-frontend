@@ -1,61 +1,14 @@
-/* On desktop: map fills only the area to the right of the sidebar and below the TopBar.
-   Offsets = px-6 (1.5rem) + sidebar-width + gap between sidebar and map area.
-   TopBar height = h-23 = 5.75rem */
+/* On desktop: map fills only the area to the right of the sidebar and below the TopBar. */
 @media (min-width: 1024px) {
   .map-fixed-container {
-    top: 5.75rem !important;      /* h-23 */
-    left: 17.5rem !important;     /* px-6 (1.5) + w-56 (14) + gap-8 (2) */
+    top: 5.75rem !important;
+    left: 17.5rem !important;
   }
 }
 @media (min-width: 1280px) {
   .map-fixed-container {
-    left: 21rem !important;       /* px-6 (1.5) + w-64 (16) + gap-14 (3.5) */
+    left: 21rem !important;
   }
-}
-
-.leaflet-container { font-family: inherit; background: #0f1117; }
-
-.leaflet-control-zoom {
-  border: none !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.5) !important;
-  border-radius: 12px !important;
-  overflow: hidden;
-  margin-bottom: calc(8vh + 32px) !important;
-  margin-right: 16px !important;
-}
-@media (min-width: 1024px) {
-  .leaflet-control-zoom {
-    margin-bottom: 16px !important;
-  }
-}
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out {
-  background: rgba(255,255,255,0.12) !important;
-  color: #fff !important;
-  border: none !important;
-  width: 36px !important; height: 36px !important; line-height: 36px !important;
-  font-size: 20px !important;
-  backdrop-filter: blur(8px);
-  transition: background 0.15s !important;
-}
-.leaflet-control-zoom-in:hover,
-.leaflet-control-zoom-out:hover { background: rgba(255,255,255,0.22) !important; }
-.leaflet-control-zoom-in { border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
-.leaflet-control-attribution {
-  background: rgba(0,0,0,0.4) !important; color: #6b7280 !important;
-  font-size: 10px !important; backdrop-filter: blur(4px);
-  border-radius: 6px 0 0 0 !important; padding: 2px 6px !important;
-}
-.leaflet-control-attribution a { color: #9ca3af !important; }
-
-.map-marker { display:flex; align-items:center; justify-content:center; cursor:pointer; }
-
-.emergency-circle {
-  animation: emergencyPulse 1.4s ease-in-out infinite;
-}
-@keyframes emergencyPulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
 }
 
 .map-search-bar {
@@ -195,7 +148,6 @@
 .tool-dot { background: #3B82F6; }
 .emerg-dot { background: #EF4444; }
 
-/* Radius control */
 .map-radius-control {
   cursor: default;
   position: absolute;
@@ -281,6 +233,18 @@
   50% { opacity:0.4; transform:scale(0.8); }
 }
 
+/* Zoom control - aliniat cu inputul KM pe mobile */
+.mapboxgl-ctrl-bottom-right {
+  bottom: calc(8vh + 48px) !important;
+  right: 16px !important;
+}
+@media (min-width: 1024px) {
+  .mapboxgl-ctrl-bottom-right {
+    bottom: 100px !important;
+    right: 16px !important;
+  }
+}
+
 .pc-overlay {
   position: fixed; inset: 0; z-index: 1000;
   background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
@@ -361,4 +325,8 @@
   padding: 3px 10px; border-radius: 20px;
   font-size: 11px; font-weight: 500;
   background: rgba(255,255,255,0.05); border: 1px solid;
+}
+
+.mapboxgl-ctrl-attrib {
+  display: none !important;
 }

@@ -2,17 +2,16 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
-import { MapContainer, TileLayer, ZoomControl, useMap } from "react-leaflet";
-import L from "leaflet";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import "leaflet/dist/leaflet.css";
+import "mapbox-gl/dist/mapbox-gl.css";
 import "./map.css";
 import { useRadius } from "@/context/RadiusContext";
 
-const DEFAULT_CENTER: [number, number] = [47.1585, 27.6014];
+const DEFAULT_CENTER: [number, number] = [27.6014, 47.1585];
 const DEFAULT_ZOOM = 12;
 const API = "http://localhost:5248";
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
 type FilterMode = "disponibili" | "pot-ajuta";
 
@@ -41,7 +40,6 @@ interface EventItem {
   createdByUserId: number;
   createdByEmail?: string;
   createdByFullName?: string;
-  createdByUser?: { fullName?: string; email?: string };
 }
 
 interface UserMarker {
@@ -69,40 +67,24 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function seededGeoOffset(seed: number): [number, number] {
+  const dLng = ((seed % 233280) / 233280 - 0.5) * 0.002;
+  const dLat = (((seed * 6971) % 233280) / 233280 - 0.5) * 0.002;
+  return [dLng, dLat];
+}
+
 function LocationModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
-
   return createPortal(
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6"
-      style={{ zIndex: 9999 }}
-      onClick={onClose}
-    >
-      <div
-        className="bg-[#1C1C1C] rounded-3xl p-6 w-full max-w-sm border border-white/10 flex flex-col gap-5 animate-fade-up"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6" style={{ zIndex: 9999 }} onClick={onClose}>
+      <div className="bg-[#1C1C1C] rounded-3xl p-6 w-full max-w-sm border border-white/10 flex flex-col gap-5 animate-fade-up" onClick={(e) => e.stopPropagation()}>
         <div className="flex flex-col gap-2">
-          <h2 className="text-white font-bold text-lg font-montagu">
-            Location Required
-          </h2>
-          <p className="text-white/50 text-sm leading-relaxed">
-            To filter by radius, you need to set your location in your profile first.
-          </p>
+          <h2 className="text-white font-bold text-lg font-montagu">Location Required</h2>
+          <p className="text-white/50 text-sm leading-relaxed">To filter by radius, you need to set your location in your profile first.</p>
         </div>
         <div className="flex flex-col gap-3">
-          <button
-            onClick={() => router.push("/profile/settings/personal")}
-            className="w-full bg-green-light text-black font-bold py-3 rounded-xl hover:bg-green-light/85 transition-colors"
-          >
-            Go to Settings
-          </button>
-          <button
-            onClick={onClose}
-            className="w-full border border-white/20 text-white/60 font-medium py-3 rounded-xl hover:bg-white/5 transition-colors"
-          >
-            Cancel
-          </button>
+          <button onClick={() => router.push("/profile/settings/personal")} className="w-full bg-green-light text-black font-bold py-3 rounded-xl hover:bg-green-light/85 transition-colors">Go to Settings</button>
+          <button onClick={onClose} className="w-full border border-white/20 text-white/60 font-medium py-3 rounded-xl hover:bg-white/5 transition-colors">Cancel</button>
         </div>
       </div>
     </div>,
@@ -117,8 +99,7 @@ function ProfileCard({ user, onClose }: { user: UserProfile; onClose: () => void
   useEffect(() => {
     const token = localStorage.getItem("token");
     fetch(`${API}/api/user/profile`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((d) => setCurrentUserId(d.id));
+      .then((r) => r.json()).then((d) => setCurrentUserId(d.id));
   }, []);
 
   const handleContact = async () => {
@@ -142,11 +123,7 @@ function ProfileCard({ user, onClose }: { user: UserProfile; onClose: () => void
       <div className="pc-card" onClick={(e) => e.stopPropagation()}>
         <div className="pc-header">
           <div className="pc-avatar overflow-hidden bg-[#2e2e2e] flex items-center justify-center">
-            {user.avatarUrl ? (
-              <Image src={user.avatarUrl} alt={name} width={64} height={64} className="object-cover w-full h-full" />
-            ) : (
-              <span className="text-white font-bold text-xl">{initials}</span>
-            )}
+            {user.avatarUrl ? <Image src={user.avatarUrl} alt={name} width={64} height={64} className="object-cover w-full h-full" /> : <span className="text-white font-bold text-xl">{initials}</span>}
           </div>
           <div className="flex flex-col gap-2 flex-1">
             <h2 className="pc-name">{name}</h2>
@@ -156,35 +133,21 @@ function ProfileCard({ user, onClose }: { user: UserProfile; onClose: () => void
                 <div className="pc-trust-divider" />
                 <span className="pc-trust-value">{Math.round(user.trustScore)}%</span>
               </div>
-              {isOwn ? (
-                <span className="ec-your-post">Your profile</span>
-              ) : (
-                <button className="ec-contact-btn" onClick={handleContact}>💬 Contact</button>
-              )}
+              {isOwn ? <span className="ec-your-post">Your profile</span> : <button className="ec-contact-btn" onClick={handleContact}>💬 Contact</button>}
             </div>
           </div>
         </div>
-        {user.bio && (
-          <div className="pc-section bio-section">
-            <p className="pc-bio">{user.bio}</p>
-          </div>
-        )}
+        {user.bio && <div className="pc-section bio-section"><p className="pc-bio">{user.bio}</p></div>}
         {user.skills.length > 0 && (
           <div className="pc-section skills-section">
             <h3 className="pc-section-title skills-title">★ Skills</h3>
-            <div className="pc-grid">
-              {user.skills.map((s, i) => (
-                <div key={i} className="pc-item"><span className="pc-dot skill-dot" />{s}</div>
-              ))}
-            </div>
+            <div className="pc-grid">{user.skills.map((s, i) => <div key={i} className="pc-item"><span className="pc-dot skill-dot" />{s}</div>)}</div>
           </div>
         )}
         {user.tools.length > 0 && (
           <div className="pc-section tools-section">
             <h3 className="pc-section-title tools-title">⚙ Tools & Resources</h3>
-            {user.tools.map((t, i) => (
-              <div key={i} className="pc-item"><span className="pc-dot tool-dot" />{t}</div>
-            ))}
+            {user.tools.map((t, i) => <div key={i} className="pc-item"><span className="pc-dot tool-dot" />{t}</div>)}
           </div>
         )}
       </div>
@@ -200,9 +163,7 @@ function EventCard({ event, onClose }: { event: EventItem; onClose: () => void }
   useEffect(() => {
     const token = localStorage.getItem("token");
     const h = { Authorization: `Bearer ${token}` };
-    fetch(`${API}/api/user/profile`, { headers: h })
-      .then((r) => r.json())
-      .then((d) => setCurrentUserId(d.id));
+    fetch(`${API}/api/user/profile`, { headers: h }).then((r) => r.json()).then((d) => setCurrentUserId(d.id));
     fetch(`${API}/api/user/${event.createdByUserId}`, { headers: h })
       .then((r) => { if (r.ok) return r.json(); return null; })
       .then((d) => { if (d) setAuthorProfile({ trustScore: d.trustScore ?? 0, avatarUrl: d.avatarUrl }); })
@@ -225,29 +186,21 @@ function EventCard({ event, onClose }: { event: EventItem; onClose: () => void }
   const typeStr = typeof event.type === "number" ? typeNumMap[event.type] : event.type;
   const typeMap: Record<string, { label: string; color: string; bg: string }> = {
     Emergency: { label: "Emergency", color: "#EF4444", bg: "rgba(239,68,68,0.15)" },
-    Skill:     { label: "Skill",     color: "#FFD700", bg: "rgba(255,215,0,0.15)" },
-    Lend:      { label: "Lend",      color: "#3B82F6", bg: "rgba(59,130,246,0.15)" },
+    Skill: { label: "Skill", color: "#FFD700", bg: "rgba(255,215,0,0.15)" },
+    Lend: { label: "Lend", color: "#3B82F6", bg: "rgba(59,130,246,0.15)" },
   };
   const t = typeMap[typeStr ?? "Skill"] ?? typeMap["Skill"];
   const name = event.createdByFullName || event.createdByEmail?.split("@")[0] || "Unknown";
   const initials = name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2);
   const isOwn = currentUserId !== null && currentUserId === event.createdByUserId;
-  const tagsArray: string[] = Array.isArray(event.tags)
-    ? event.tags
-    : typeof event.tags === "string" && event.tags.trim() !== ""
-    ? event.tags.split(",").map((t) => t.trim())
-    : [];
+  const tagsArray: string[] = Array.isArray(event.tags) ? event.tags : typeof event.tags === "string" && event.tags.trim() !== "" ? event.tags.split(",").map((tag) => tag.trim()) : [];
 
   return (
     <div className="pc-overlay" onClick={onClose}>
       <div className="pc-card" onClick={(e) => e.stopPropagation()}>
         <div className="pc-header">
           <div className="pc-avatar overflow-hidden bg-[#2e2e2e] flex items-center justify-center">
-            {authorProfile?.avatarUrl ? (
-              <Image src={authorProfile.avatarUrl} alt={name} width={64} height={64} className="object-cover w-full h-full" />
-            ) : (
-              <span className="text-white font-bold text-xl">{initials}</span>
-            )}
+            {authorProfile?.avatarUrl ? <Image src={authorProfile.avatarUrl} alt={name} width={64} height={64} className="object-cover w-full h-full" /> : <span className="text-white font-bold text-xl">{initials}</span>}
           </div>
           <div className="flex flex-col gap-2 flex-1">
             <h2 className="pc-name">{name}</h2>
@@ -257,22 +210,12 @@ function EventCard({ event, onClose }: { event: EventItem; onClose: () => void }
                 <div className="pc-trust-divider" />
                 <span className="pc-trust-value">{Math.round(authorProfile?.trustScore ?? 0)}%</span>
               </div>
-              {isOwn ? (
-                <span className="ec-your-post">Your post</span>
-              ) : (
-                <button className="ec-contact-btn" onClick={handleContact}>💬 Contact</button>
-              )}
+              {isOwn ? <span className="ec-your-post">Your post</span> : <button className="ec-contact-btn" onClick={handleContact}>💬 Contact</button>}
             </div>
           </div>
-          <div className="ec-corner-badge" style={{ color: t.color, background: t.bg, border: `1px solid ${t.color}` }}>
-            {t.label}
-          </div>
+          <div className="ec-corner-badge" style={{ color: t.color, background: t.bg, border: `1px solid ${t.color}` }}>{t.label}</div>
         </div>
-        {event.imageUrl && (
-          <div className="ec-image-wrap">
-            <img src={`${API}${event.imageUrl}`} alt="event" className="ec-image" />
-          </div>
-        )}
+        {event.imageUrl && <div className="ec-image-wrap"><img src={event.imageUrl.startsWith("http") ? event.imageUrl : `${API}${event.imageUrl}`} alt="event" className="ec-image" /></div>}
         <div className="pc-section bio-section">
           <p className="pc-bio" dangerouslySetInnerHTML={{ __html: event.description }} />
           {typeStr === "Emergency" && <span className="ec-verified">Verified info</span>}
@@ -282,109 +225,12 @@ function EventCard({ event, onClose }: { event: EventItem; onClose: () => void }
             <h3 className="pc-section-title" style={{ color: t.color, marginBottom: 10 }}>
               {typeStr === "Skill" ? "★ Skill required" : typeStr === "Lend" ? "⚙ Tool needed" : "⚠ Details"}
             </h3>
-            <div className="ec-tags">
-              {tagsArray.map((tag, i) => (
-                <span key={i} className="ec-tag" style={{ color: t.color, borderColor: t.color }}>{tag}</span>
-              ))}
-            </div>
+            <div className="ec-tags">{tagsArray.map((tag, i) => <span key={i} className="ec-tag" style={{ color: t.color, borderColor: t.color }}>{tag}</span>)}</div>
           </div>
         )}
       </div>
     </div>
   );
-}
-
-function MarkersLayer({
-  userMarkers,
-  eventMarkers,
-  onUserClick,
-  onEventClick,
-}: {
-  userMarkers: UserMarker[];
-  eventMarkers: EventMarker[];
-  onUserClick: (u: UserProfile) => void;
-  onEventClick: (e: EventItem) => void;
-}) {
-  const map = useMap();
-  const refs = useRef<(L.Circle | L.Marker)[]>([]);
-
-  useEffect(() => {
-    refs.current.forEach((m) => map.removeLayer(m));
-    refs.current = [];
-
-    userMarkers.forEach(({ user, lat, lng, hasSkills, hasTools }) => {
-      const seed = user.id * 9301 + 49297;
-      const rLat = ((seed % 233280) / 233280 - 0.5) * 0.001;
-      const rLng = (((seed * 6971) % 233280) / 233280 - 0.5) * 0.0015;
-
-      const addCircle = (color: string, offsetLng = 0) => {
-        const circle = L.circle([lat + rLat, lng + rLng + offsetLng], {
-          radius: 300,
-          color,
-          fillColor: color,
-          fillOpacity: 0.25,
-          opacity: 0.6,
-          weight: 2,
-        }).addTo(map);
-        circle.on("click", () => onUserClick(user));
-        refs.current.push(circle);
-      };
-
-      if (hasSkills && hasTools) {
-        addCircle("#FFD700", -0.002);
-        addCircle("#3B82F6", +0.002);
-      } else if (hasSkills) {
-        addCircle("#FFD700");
-      } else {
-        addCircle("#3B82F6");
-      }
-    });
-
-    eventMarkers.forEach(({ event, type }) => {
-      const color = type === "emergency" ? "#EF4444" : type === "skill" ? "#FFD700" : "#3B82F6";
-      const seed = event.id * 6271 + 12347;
-      const rLat = ((seed % 233280) / 233280 - 0.5) * 0.001;
-      const rLng = (((seed * 4421) % 233280) / 233280 - 0.5) * 0.0015;
-
-      if (type === "emergency") {
-        const icon = L.divIcon({
-          className: "",
-          html: `<div style="
-            width: 26px; height: 26px;
-            background: #EF4444;
-            border: 2px solid #EF4444;
-            border-radius: 50%;
-            box-shadow: 0 0 12px rgba(239,68,68,0.8), 0 0 24px rgba(239,68,68,0.4);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: bold; color: white;
-            line-height: 1;
-          ">🚨</div>`,
-          iconSize: [26, 26],
-          iconAnchor: [13, 13],
-        });
-        const marker = L.marker([event.latitude, event.longitude], { icon }).addTo(map);
-        marker.on("click", () => onEventClick(event));
-        refs.current.push(marker);
-      } else {
-        const circle = L.circle([event.latitude + rLat, event.longitude + rLng], {
-          radius: 300,
-          color,
-          fillColor: color,
-          fillOpacity: 0.25,
-          opacity: 0.6,
-          weight: 2,
-        }).addTo(map);
-        circle.on("click", () => onEventClick(event));
-        refs.current.push(circle);
-      }
-    });
-
-    return () => {
-      refs.current.forEach((m) => map.removeLayer(m));
-    };
-  }, [userMarkers, eventMarkers, map, onUserClick, onEventClick]);
-
-  return null;
 }
 
 export default function MapView() {
@@ -401,28 +247,46 @@ export default function MapView() {
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
 
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
   const radiusRef = useRef<HTMLDivElement>(null);
   const { radiusKm, setRadiusKm } = useRadius();
 
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    if (!mounted || !radiusRef.current) return;
-    L.DomEvent.disableClickPropagation(radiusRef.current);
+    if (!mounted || !mapContainer.current || mapRef.current) return;
+
+    const initMap = async () => {
+      const mapboxgl = (await import("mapbox-gl")).default;
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+
+      const map = new mapboxgl.Map({
+        container: mapContainer.current!,
+        style: "mapbox://styles/mapbox/dark-v11",
+        center: DEFAULT_CENTER,
+        zoom: DEFAULT_ZOOM,
+      });
+
+      map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+      mapRef.current = map;
+    };
+
+    initMap();
+
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
   }, [mounted]);
 
   useEffect(() => {
     if (!mounted) return;
     const token = localStorage.getItem("token");
-    fetch(`${API}/api/user/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${API}/api/user/profile`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
-      .then((d) => {
-        if (d.latitude && d.longitude) {
-          setUserLocation({ lat: d.latitude, lng: d.longitude });
-        }
-      });
+      .then((d) => { if (d.latitude && d.longitude) setUserLocation({ lat: d.latitude, lng: d.longitude }); });
   }, [mounted]);
 
   useEffect(() => {
@@ -437,25 +301,19 @@ export default function MapView() {
         ]);
         const skillUsers: UserProfile[] = sRes.ok ? await sRes.json() : [];
         const toolUsers: UserProfile[] = tRes.ok ? await tRes.json() : [];
-
         const map = new Map<number, { user: UserProfile; hasSkills: boolean; hasTools: boolean }>();
         skillUsers.forEach((u) => map.set(u.id, { user: u, hasSkills: true, hasTools: false }));
         toolUsers.forEach((u) => {
           if (map.has(u.id)) map.get(u.id)!.hasTools = true;
           else map.set(u.id, { user: u, hasSkills: false, hasTools: true });
         });
-
         const results: UserMarker[] = [];
         for (const entry of map.values()) {
           const { user } = entry;
-          if (user.latitude && user.longitude) {
-            results.push({ ...entry, lat: user.latitude, lng: user.longitude });
-          }
+          if (user.latitude && user.longitude) results.push({ ...entry, lat: user.latitude, lng: user.longitude });
         }
         setUserMarkers(results);
-      } finally {
-        setLoadingUsers(false);
-      }
+      } finally { setLoadingUsers(false); }
     };
     fetchUsers();
   }, [mounted]);
@@ -474,16 +332,12 @@ export default function MapView() {
         const emergEvents: EventItem[] = emergRes.ok ? await emergRes.json() : [];
         const skillEvents: EventItem[] = skillRes.ok ? await skillRes.json() : [];
         const lendEvents: EventItem[] = lendRes.ok ? await lendRes.json() : [];
-
         const emergMarkers: EventMarker[] = emergEvents.filter(e => e.latitude !== 0 && e.longitude !== 0).map((e) => ({ event: e, type: "emergency" as const }));
         const skillMarkers: EventMarker[] = skillEvents.filter(e => e.latitude !== 0 && e.longitude !== 0).map((e) => ({ event: e, type: "skill" as const }));
         const lendMarkers: EventMarker[] = lendEvents.filter(e => e.latitude !== 0 && e.longitude !== 0).map((e) => ({ event: e, type: "lend" as const }));
-
         setEventMarkersDisponibili(emergMarkers);
         setEventMarkersPotAjuta([...skillMarkers, ...lendMarkers, ...emergMarkers]);
-      } finally {
-        setLoadingEvents(false);
-      }
+      } finally { setLoadingEvents(false); }
     };
     fetchEvents();
   }, [mounted]);
@@ -494,63 +348,94 @@ export default function MapView() {
   const q = searchQuery.toLowerCase().trim();
 
   const filteredUserMarkers = userMarkers.filter(({ user, lat, lng }) => {
-    if (userLocation) {
-      const dist = haversineKm(userLocation.lat, userLocation.lng, lat, lng);
-      if (dist > radiusKm) return false;
-    }
+    if (userLocation && haversineKm(userLocation.lat, userLocation.lng, lat, lng) > radiusKm) return false;
     if (!q) return true;
-    return (
-      user.skills.some((s) => s.toLowerCase().includes(q)) ||
-      user.tools.some((t) => t.toLowerCase().includes(q)) ||
-      user.fullName?.toLowerCase().includes(q)
-    );
+    return user.skills.some((s) => s.toLowerCase().includes(q)) || user.tools.some((t) => t.toLowerCase().includes(q)) || user.fullName?.toLowerCase().includes(q);
   });
 
   const filteredEventMarkers = (filter === "disponibili" ? eventMarkersDisponibili : eventMarkersPotAjuta).filter(({ event }) => {
-    if (userLocation) {
-      const dist = haversineKm(userLocation.lat, userLocation.lng, event.latitude, event.longitude);
-      if (dist > radiusKm) return false;
-    }
+    if (userLocation && haversineKm(userLocation.lat, userLocation.lng, event.latitude, event.longitude) > radiusKm) return false;
     if (!q) return true;
     const tags = Array.isArray(event.tags) ? event.tags : [];
-    return (
-      event.description?.toLowerCase().includes(q) ||
-      tags.some((t) => t.toLowerCase().includes(q)) ||
-      event.createdByFullName?.toLowerCase().includes(q)
-    );
+    return event.description?.toLowerCase().includes(q) || tags.some((t) => t.toLowerCase().includes(q)) || event.createdByFullName?.toLowerCase().includes(q);
   });
 
   const activeUserMarkers = filter === "disponibili" ? filteredUserMarkers : [];
   const activeEventMarkers = filteredEventMarkers;
   const isLoading = loadingUsers || loadingEvents;
 
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+
+    const doUpdate = async () => {
+      const mapboxgl = (await import("mapbox-gl")).default;
+
+      markersRef.current.forEach((m) => m.remove());
+      markersRef.current = [];
+
+      activeUserMarkers.forEach(({ user, lat, lng, hasSkills, hasTools }) => {
+        const seed = user.id * 9301 + 49297;
+        const [dLng, dLat] = seededGeoOffset(seed);
+
+        const addCircleMarker = (color: string, extraDLng = 0) => {
+          const el = document.createElement("div");
+          el.style.cssText = `width:28px !important;height:28px !important;min-width:28px !important;min-height:28px !important;max-width:28px !important;max-height:28px !important;border-radius:50%;background:${color}40;border:2px solid ${color};cursor:pointer;box-sizing:border-box;`;
+          el.addEventListener("click", (e) => { e.stopPropagation(); handleUserClick(user); });
+          const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
+            .setLngLat([lng + dLng + extraDLng, lat + dLat])
+            .addTo(map);
+          markersRef.current.push(marker);
+        };
+
+        if (hasSkills && hasTools) {
+          addCircleMarker("#FFD700", -0.001);
+          addCircleMarker("#3B82F6", +0.001);
+        } else {
+          addCircleMarker(hasSkills ? "#FFD700" : "#3B82F6");
+        }
+      });
+
+      activeEventMarkers.forEach(({ event, type }) => {
+        const seed = event.id * 6271 + 12347;
+        const [dLng, dLat] = seededGeoOffset(seed);
+        const color = type === "skill" ? "#FFD700" : "#3B82F6";
+        const el = document.createElement("div");
+
+        if (type === "emergency") {
+          el.style.cssText = `width:30px !important;height:30px !important;min-width:30px !important;min-height:30px !important;max-width:30px !important;max-height:30px !important;border-radius:50%;background:#EF4444;border:2px solid #EF4444;box-shadow:0 0 12px rgba(239,68,68,0.8),0 0 24px rgba(239,68,68,0.4);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;box-sizing:border-box;`;
+          el.innerHTML = "🚨";
+          el.addEventListener("click", (e) => { e.stopPropagation(); handleEventClick(event); }); // adaugă asta
+          const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
+            .setLngLat([event.longitude, event.latitude])
+            .addTo(map);
+          markersRef.current.push(marker);
+        } else {
+          el.style.cssText = `width:28px !important;height:28px !important;min-width:28px !important;min-height:28px !important;max-width:28px !important;max-height:28px !important;border-radius:50%;background:${color}40;border:2px solid ${color};cursor:pointer;box-sizing:border-box;`;
+          el.addEventListener("click", (e) => { e.stopPropagation(); handleEventClick(event); });
+          const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
+            .setLngLat([event.longitude + dLng, event.latitude + dLat])
+            .addTo(map);
+          markersRef.current.push(marker);
+        }
+      });
+    };
+
+    if (map.isStyleLoaded()) {
+      doUpdate();
+    } else {
+      map.once("load", doUpdate);
+    }
+  }, [activeUserMarkers, activeEventMarkers, handleUserClick, handleEventClick]);
+
   if (!mounted) return null;
 
   return (
     <>
       <div className="map-fixed-container" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
-        <MapContainer
-          center={DEFAULT_CENTER}
-          zoom={DEFAULT_ZOOM}
-          zoomControl={false}
-          scrollWheelZoom={true}
-          style={{ height: "100%", width: "100%" }}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          />
-          <ZoomControl position="bottomright" />
-          <MarkersLayer
-            userMarkers={activeUserMarkers}
-            eventMarkers={activeEventMarkers}
-            onUserClick={handleUserClick}
-            onEventClick={handleEventClick}
-          />
-        </MapContainer>
+        <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
 
         <div className="map-search-bar">
-          <Image src="/navbar.svg" alt="" fill className="object-cover opacity-100" />
           <div className="map-search-bar-content">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="map-search-icon">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -561,25 +446,13 @@ export default function MapView() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            {searchQuery && (
-              <button className="map-search-clear" onClick={() => setSearchQuery("")}>✕</button>
-            )}
+            {searchQuery && <button className="map-search-clear" onClick={() => setSearchQuery("")}>✕</button>}
           </div>
         </div>
 
         <div className="filter-bar">
-          <button
-            className={`filter-btn ${filter === "disponibili" ? "filter-btn--active" : ""}`}
-            onClick={() => { setFilter("disponibili"); setSearchQuery(""); }}
-          >
-            👤 Available
-          </button>
-          <button
-            className={`filter-btn ${filter === "pot-ajuta" ? "filter-btn--active pot-ajuta-active" : ""}`}
-            onClick={() => { setFilter("pot-ajuta"); setSearchQuery(""); }}
-          >
-            🤝 Can Help
-          </button>
+          <button className={`filter-btn ${filter === "disponibili" ? "filter-btn--active" : ""}`} onClick={() => { setFilter("disponibili"); setSearchQuery(""); }}>👤 Available</button>
+          <button className={`filter-btn ${filter === "pot-ajuta" ? "filter-btn--active pot-ajuta-active" : ""}`} onClick={() => { setFilter("pot-ajuta"); setSearchQuery(""); }}>🤝 Can Help</button>
         </div>
 
         <div className="map-legend">
@@ -596,14 +469,8 @@ export default function MapView() {
         >
           <div className="map-radius-control-content">
             <input
-              type="number"
-              min={1}
-              max={300}
-              value={radiusKm}
-              onChange={(e) => {
-                if (!userLocation) return;
-                setRadiusKm(Math.max(1, Math.min(300, Number(e.target.value))));
-              }}
+              type="number" min={1} max={300} value={radiusKm}
+              onChange={(e) => { if (!userLocation) return; setRadiusKm(Math.max(1, Math.min(300, Number(e.target.value)))); }}
               readOnly={!userLocation}
               className="map-radius-input"
               style={{ cursor: !userLocation ? "pointer" : "text" }}
@@ -620,9 +487,7 @@ export default function MapView() {
         )}
       </div>
 
-      {showLocationModal && (
-        <LocationModal onClose={() => setShowLocationModal(false)} />
-      )}
+      {showLocationModal && <LocationModal onClose={() => setShowLocationModal(false)} />}
       {selectedUser && <ProfileCard user={selectedUser} onClose={() => setSelectedUser(null)} />}
       {selectedEvent && <EventCard event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
     </>

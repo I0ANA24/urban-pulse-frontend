@@ -55,7 +55,7 @@ export default function EventCard({ event, isMyPost, onDelete, flagCount, onView
 
   const typeMap: Record<number, EventType> = { 0: "General", 1: "Emergency", 2: "Skill", 3: "Lend" };
   const mappedType = typeof event.type === "number" ? typeMap[event.type] : (event.type as EventType);
-  const isOwner = isMyPost || currentUserId === event.createdByUserId;
+  const isOwner = isMyPost || (currentUserId !== null && currentUserId === event.createdByUserId);
   const displayName = event.createdByFullName ?? event.createdByEmail?.split("@")[0] ?? "Unknown";
 
   useEffect(() => {
