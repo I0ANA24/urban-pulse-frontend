@@ -31,9 +31,6 @@ export default function ChatPage() {
   const [otherUserName, setOtherUserName] = useState("");
   const [otherUserAvatar, setOtherUserAvatar] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState(false);
-  const [ratedMessages, setRatedMessages] = useState<Set<number>>(new Set());
-  const [helpedMessages, setHelpedMessages] = useState<Set<number>>(new Set());
-  const [hasRated, setHasRated] = useState(false);
   const [showPlusMenu, setShowPlusMenu] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const plusButtonRef = useRef<HTMLButtonElement>(null);
@@ -41,45 +38,62 @@ export default function ChatPage() {
   const { connection } = useSignalR();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const loadConversationData = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5248/api/user/profile", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setCurrentUserId(data.id));
-
-    fetch("http://localhost:5248/api/chat/conversations", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const conv = data.find((c: any) => c.id === Number(id));
-        if (conv) {
-          setOtherUserId(conv.otherUserId);
-          setOtherUserName(conv.otherUserFullName ?? conv.otherUserEmail?.split("@")[0]);
-          fetch(`http://localhost:5248/api/user/${conv.otherUserId}`, {
+        const [profileRes, conversationsRes, messagesRes] = await Promise.all([
+          fetch("http://localhost:5248/api/user/profile", {
             headers: { Authorization: `Bearer ${token}` },
-          })
-            .then((res) => res.json())
-            .then((profile) => {
-              setOtherUserAvatar(profile.avatarUrl ?? null);
-              setIsVerified(profile.isVerified ?? false);
-            });
+          }),
+          fetch("http://localhost:5248/api/chat/conversations", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`http://localhost:5248/api/chat/conversations/${id}/messages`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          setCurrentUserId(profileData.id ?? null);
         }
-      });
 
-    fetch(`http://localhost:5248/api/chat/conversations/${id}/messages`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setMessages(data));
+        if (conversationsRes.ok) {
+          const conversationsData = await conversationsRes.json();
+          const conv = Array.isArray(conversationsData)
+            ? conversationsData.find((c: any) => c.id === Number(id))
+            : null;
 
-    fetch(`http://localhost:5248/api/chat/conversations/${id}/rating/check`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setHasRated(data.hasRated));
+          if (conv) {
+            setOtherUserId(conv.otherUserId);
+            setOtherUserName(conv.otherUserFullName ?? conv.otherUserEmail?.split("@")[0]);
+
+            try {
+              const otherProfileRes = await fetch(`http://localhost:5248/api/user/${conv.otherUserId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              if (otherProfileRes.ok) {
+                const profile = await otherProfileRes.json();
+                setOtherUserAvatar(profile.avatarUrl ?? null);
+                setIsVerified(profile.isVerified ?? false);
+              }
+            } catch (error) {
+              console.error("Failed to load other user profile:", error);
+            }
+          }
+        }
+
+        if (messagesRes.ok) {
+          const messagesData = await messagesRes.json();
+          setMessages(Array.isArray(messagesData) ? messagesData : []);
+        }
+      } catch (error) {
+        console.error("Failed to load chat conversation page:", error);
+      }
+    };
+
+    loadConversationData();
   }, [id]);
 
   useEffect(() => {
@@ -97,62 +111,51 @@ export default function ChatPage() {
 
   const handleSend = async () => {
     if (!text.trim()) return;
-    const token = localStorage.getItem("token");
-    await fetch(`http://localhost:5248/api/chat/conversations/${id}/messages`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text }),
-    });
-    setText("");
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:5248/api/chat/conversations/${id}/messages`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) return;
+      setText("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
   };
 
   const handleSendInfo = async () => {
     setShowPlusMenu(false);
-    const token = localStorage.getItem("token");
-    const profile = await fetch("http://localhost:5248/api/user/profile", {
-      headers: { Authorization: `Bearer ${token}` },
-    }).then((res) => res.json());
+    try {
+      const token = localStorage.getItem("token");
+      const profileRes = await fetch("http://localhost:5248/api/user/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!profileRes.ok) return;
+      const profile = await profileRes.json();
 
-    const payload = JSON.stringify({
-      name: profile.fullName ?? profile.email?.split("@")[0] ?? "—",
-      phone: profile.phoneNumber ?? "—",
-      address: profile.address ?? "—",
-    });
+      const payload = JSON.stringify({
+        name: profile.fullName ?? profile.email?.split("@")[0] ?? "-",
+        phone: profile.phoneNumber ?? "-",
+        address: profile.address ?? "-",
+      });
 
-    await fetch(`http://localhost:5248/api/chat/conversations/${id}/messages`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text: `__INFO_CARD__${payload}` }),
-    });
-  };
-
-  const handleHelped = (msgId: number, helped: boolean) => {
-    if (helped) {
-      setHelpedMessages((prev) => new Set([...prev, msgId]));
-    } else {
-      setRatedMessages((prev) => new Set([...prev, msgId]));
-      setHasRated(true);
+      const sendRes = await fetch(`http://localhost:5248/api/chat/conversations/${id}/messages`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: `__INFO_CARD__${payload}` }),
+      });
+      if (!sendRes.ok) return;
+    } catch (error) {
+      console.error("Failed to send personal info card:", error);
     }
-  };
-
-  const handleRating = async (msgId: number, rating: string) => {
-    const token = localStorage.getItem("token");
-    await fetch(`http://localhost:5248/api/chat/conversations/${id}/rating`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ rating }),
-    });
-    setRatedMessages((prev) => new Set([...prev, msgId]));
-    setHasRated(true);
   };
 
   return (
@@ -208,8 +211,6 @@ export default function ChatPage() {
             )}
             {messages.map((msg) => {
               const isMe = msg.senderId === currentUserId;
-              const hasHelped = helpedMessages.has(msg.id);
-              const hasRatedThis = ratedMessages.has(msg.id) || hasRated;
 
               if (msg.text?.startsWith("__INFO_CARD__")) {
                 const info = JSON.parse(msg.text.replace("__INFO_CARD__", ""));
@@ -251,74 +252,11 @@ export default function ChatPage() {
                 );
               }
 
-              if (msg.messageType === "rating_check" && !isMe) return null;
-
-              if (msg.messageType === "rating_check" && isMe) {
-                return (
-                  <div key={msg.id} className="flex flex-col items-center gap-3 my-4 px-2">
-                    <div className="bg-[#1e1e1e] border border-white/10 rounded-2xl p-4 w-full flex flex-col gap-3">
-                      <p className="text-white/80 text-sm text-center font-medium">
-                        {msg.text}
-                      </p>
-                      {!hasHelped && !hasRatedThis && (
-                        <div className="flex gap-2 justify-center">
-                          <button
-                            onClick={() => handleHelped(msg.id, true)}
-                            className="flex-1 py-2.5 bg-green-400 text-black rounded-full text-xs font-bold"
-                          >
-                            Yes, they helped!
-                          </button>
-                          <button
-                            onClick={() => handleHelped(msg.id, false)}
-                            className="flex-1 py-2.5 bg-white/10 text-white rounded-full text-xs font-bold"
-                          >
-                            No, they didn&apos;t
-                          </button>
-                        </div>
-                      )}
-                      {hasHelped && !hasRatedThis && (
-                        <>
-                          <p className="text-white/50 text-xs text-center">
-                            How would you rate the help?
-                          </p>
-                          <div className="flex gap-2 justify-center">
-                            <button
-                              onClick={() => handleRating(msg.id, "helpful")}
-                              className="flex-1 py-2.5 bg-green-400 text-black rounded-full text-xs font-bold"
-                            >
-                              👍 Helpful
-                            </button>
-                            <button
-                              onClick={() => handleRating(msg.id, "not_helpful")}
-                              className="flex-1 py-2.5 bg-red-600 text-white rounded-full text-xs font-bold"
-                            >
-                              👎 Not Helpful
-                            </button>
-                          </div>
-                        </>
-                      )}
-                      {hasRatedThis && (
-                        <p className="text-white/40 text-xs text-center">
-                          ✓ Thank you for your feedback!
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              }
+              if (msg.messageType === "rating_check") return null;
 
               return (
-                <div
-                  key={msg.id}
-                  className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[75%] px-4 py-2.5 rounded-3xl text-sm ${
-                      isMe
-                        ? "bg-[#B8D4F0] text-[#003A69]"
-                        : "bg-[#2A2A2A] text-white"
-                    }`}
-                  >
+                <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[75%] px-4 py-2.5 rounded-3xl text-sm ${isMe ? "bg-[#B8D4F0] text-[#003A69]" : "bg-[#2A2A2A] text-white"}`}>
                     <p>{msg.text}</p>
                   </div>
                 </div>

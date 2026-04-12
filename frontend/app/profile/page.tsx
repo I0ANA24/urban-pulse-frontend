@@ -20,6 +20,7 @@ interface UserProfile {
   isVerified: boolean;
   role: string;
   trustScore: number;
+  helpfulCount: number;
   createdAt: string;
 }
 
@@ -29,18 +30,42 @@ function getInitials(name: string) {
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [postsCount, setPostsCount] = useState(0);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { viewAsUser, setViewAsUser } = useUser();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch(`${API}/api/user/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setProfile(data));
+    const loadProfilePage = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const [profileRes, postsRes] = await Promise.all([
+          fetch(`${API}/api/user/profile`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API}/api/user/my-posts`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          setProfile(profileData);
+        }
+
+        if (postsRes.ok) {
+          const postsData = await postsRes.json();
+          setPostsCount(Array.isArray(postsData) ? postsData.length : 0);
+        } else {
+          setPostsCount(0);
+        }
+      } catch (error) {
+        console.error("Failed to load profile page:", error);
+      }
+    };
+
+    loadProfilePage();
   }, []);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,18 +76,23 @@ export default function ProfilePage() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API}/api/user/avatar`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API}/api/user/avatar`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
 
-    if (res.ok) {
-      const data = await res.json();
-      setProfile((prev) => prev ? { ...prev, avatarUrl: data.avatarUrl } : prev);
+      if (res.ok) {
+        const data = await res.json();
+        setProfile((prev) => prev ? { ...prev, avatarUrl: data.avatarUrl } : prev);
+      }
+    } catch (error) {
+      console.error("Failed to upload avatar:", error);
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
   const handleAdminMode = () => {
@@ -165,7 +195,6 @@ export default function ProfilePage() {
               {profile?.trustScore ?? 0}%
             </p>
           </div>
-
         </div>
       </section>
 
@@ -186,12 +215,12 @@ export default function ProfilePage() {
         <section className="w-full h-25 border-2 border-yellow-primary rounded-2xl flex items-center py-2 shadow-sm bg-[#1C1C1C]">
           <div className="flex-1 flex flex-col items-center justify-center gap-1">
             <h3 className="text-lg font-bold">Helped</h3>
-            <p className="text-yellow-primary text-3xl font-bold">0</p>
+            <p className="text-yellow-primary text-3xl font-bold">{profile?.helpfulCount ?? 0}</p>
           </div>
           <div className="w-0.5 self-stretch my-3 bg-white"></div>
           <div className="flex-1 flex flex-col items-center justify-center gap-1">
             <h3 className="text-lg font-bold">Posts</h3>
-            <p className="text-yellow-primary text-3xl font-bold">0</p>
+            <p className="text-yellow-primary text-3xl font-bold">{postsCount}</p>
           </div>
         </section>
 
