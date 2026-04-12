@@ -6,7 +6,9 @@ public enum EventType
     General,
     Emergency,
     Skill,
-    Lend
+    Lend,
+    LostPet,
+    FoundPet
 }
 
 
